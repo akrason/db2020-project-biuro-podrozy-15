@@ -23,15 +23,6 @@ def execute():
     except pymysql.Error as e:
         print("Error while connecting to MySQL", e)
     finally:
-        # cursor.execute("CREATE TABLE Klient (id_klienta INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, imie VARCHAR(30) NOT NULL, nazwisko VARCHAR(30) NOT NULL, email VARCHAR(50) NOT NULL, nr_telefonu INT(9) UNSIGNED NOT NULL)")
-        # cursor.execute("DROP TABLE MyGuests")
-
-        # sql="INSERT INTO Klient (imie, nazwisko, email, nr_telefonu) VALUES (%s, %s, %s, %s)"
-        # val = ("Jan", "Kowalski", "jkowal@gmail.com", '234765894')
-        # cursor.execute(sql, val)
-        # db.commit()
-
-        # print("ID: ", cursor.lastrowid)
         cursor.execute("SELECT nazwisko FROM Klient WHERE id_klienta=1")
 
         result = cursor.fetchall()
