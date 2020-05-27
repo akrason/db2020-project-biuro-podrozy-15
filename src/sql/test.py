@@ -22,28 +22,29 @@ def execute():
 
     except pymysql.Error as e:
         print("Error while connecting to MySQL", e)
+        for line in open("podroze_db.sql"):
+            connection.cursor.execute(line)
     finally:
-        cursor.execute("SELECT nazwisko FROM Klient WHERE id_klienta=1")
-
-        result = cursor.fetchall()
-
-        for x in result:
-            print(x)
-    # with connection.cursor() as cursor:
-    #     sql = "INSERT INTO t VALUES(%s)"
-    #     cursor.execute(sql, 35)
-    # connection.commit()
-
-    with connection.cursor() as cursor:
-         sql = "SHOW TABLES"
-         cursor.execute(sql)
-         result = cursor.fetchall()
-         for f in result:
-             print(f)
-
-    #connection.cursor().execute("CREATE TABLE Transport (id_transportu INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY, koszt_transportu DECIMAL(8,2),typ_transportu ENUM('samolot','statek','pociąg','autobus','własny') NOT NULL, miejsce_wyjazdu VARCHAR(100))")
+        return connection
 
 
+def test():
+    connection = execute()
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT id_klienta FROM Klient WHERE id_klienta=1")
 
+            result = cursor.fetchall()
 
-    connection.close()
+            for x in result:
+                print(x)
+
+        with connection.cursor() as cursor:
+            sql = "SHOW TABLES"
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            for f in result:
+                print(f)
+
+    finally:
+        connection.close()
