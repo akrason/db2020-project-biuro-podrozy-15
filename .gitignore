@@ -7,3 +7,5 @@
 *.pyc
 *.class
 *.log
+*.idea
+*.git
