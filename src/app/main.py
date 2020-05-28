@@ -1,4 +1,4 @@
 import src.sql.test as api
 
-
-api.test()
+api.execute()
+#api.test()

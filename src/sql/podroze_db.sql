@@ -1,16 +1,18 @@
-drop schema if exists podroze_db;
-create schema podroze_db collate = utf8_general_ci;
-use podroze_db;
+DROP DATABASE IF EXISTS podroze_db;
+CREATE USER IF NOT EXISTS 'admin'@'localhost' IDENTIFIED BY 'podroze';
 
+CREATE DATABASE IF NOT EXISTS podroze_db CHARACTER SET utf8 COLLATE utf8_polish_ci;
 
-CREATE USER 'admin'@'localhost' IDENTIFIED BY 'podroze';
-GRANT ALL PRIVILEGES ON 'podroze_db.*' TO 'podroze'@'localhost';
 FLUSH PRIVILEGES;
+
+
+USE podroze_db;
+
+
 
 create table klient
 (
-    id_klienta  int(6) unsigned auto_increment
-        primary key,
+    id_klienta  int(6) unsigned auto_increment primary key,
     imie        varchar(30)     not null,
     nazwisko    varchar(30)     not null,
     email       varchar(50)     not null,
@@ -19,21 +21,18 @@ create table klient
 
 create table miejsce
 (
-    id_miejsca int(6) unsigned auto_increment
-        primary key,
+    id_miejsca int(6) unsigned auto_increment primary key,
     kraj       varchar(50) null,
     miasto     varchar(50) null
 );
 
 create table hotel
 (
-    id_hotelu   int(6) unsigned auto_increment
-        primary key,
+    id_hotelu   int(6) unsigned auto_increment primary key,
     nocleg_cena decimal(6, 2)   null,
     id_miejsca  int(6) unsigned null,
     nazwa       varchar(50)     null,
-    constraint hotel_ibfk_1
-        foreign key (id_miejsca) references miejsce (id_miejsca)
+    constraint hotel_ibfk_1 foreign key (id_miejsca) references miejsce (id_miejsca)
 );
 
 create index id_miejsca
@@ -41,8 +40,7 @@ create index id_miejsca
 
 create table transport
 (
-    id_transportu    int(6) unsigned auto_increment
-        primary key,
+    id_transportu    int(6) unsigned auto_increment primary key,
     koszt_transportu decimal(8, 2)                                             null,
     typ_transportu   enum ('samolot', 'statek', 'pociąg', 'autobus', 'własny') not null,
     miejsce_wyjazdu  varchar(100)                                              null
@@ -50,8 +48,7 @@ create table transport
 
 create table oferta
 (
-    id_oferty     int(6) unsigned auto_increment
-        primary key,
+    id_oferty     int(6) unsigned auto_increment primary key,
     cena          decimal(8, 2)   null,
     ilosc_miejsc  int(6)          null,
     id_miejsca    int(6) unsigned null,
@@ -78,8 +75,7 @@ create index id_transportu
 
 create table rezerwacja
 (
-    id_rezerwacji   int(6) unsigned auto_increment
-        primary key,
+    id_rezerwacji   int(6) unsigned auto_increment primary key,
     liczba_osob     int(6)          null,
     data_rezerwacji datetime        null,
     platnosc        tinyint(1)      null,
@@ -94,11 +90,9 @@ create table rezerwacja
 CREATE INDEX id_klienta
     on rezerwacja (id_klienta);
 
-create index id_oferty
-    on rezerwacja (id_oferty);
+CREATE INDEX id_oferty
+    ON rezerwacja (id_oferty);
 
-INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (1, 100.56, 5, 'El Pingüino');
-INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (2, 255.78, 12, 'Paradis');
 
 INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (1, 'Geralt', 'z Rivii', 'rzeznikzBlaviken@gmail.com', 234765894);
 INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (2, 'Triss', 'Merigold', 'czarymary@temeria.org', 123456789);
@@ -119,11 +113,12 @@ INSERT INTO podroze_db.miejsce (id_miejsca, kraj, miasto) VALUES (10, 'Kanada', 
 INSERT INTO podroze_db.miejsce (id_miejsca, kraj, miasto) VALUES (11, 'Japonia', 'Kioto');
 INSERT INTO podroze_db.miejsce (id_miejsca, kraj, miasto) VALUES (12, 'Francja', 'Lyon');
 
+INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (1, 100.56, 5, 'El Pingüino');
+INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (2, 255.78, 12, 'Paradis');
+
 INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (1, null, 'samolot', 'Warszawa');
 INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (2, null, 'pociąg', 'Kraków');
 INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (3, null, 'samolot', 'Kraków');
 INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (4, null, 'statek', 'Gdańsk');
 
 COMMIT;
-
-

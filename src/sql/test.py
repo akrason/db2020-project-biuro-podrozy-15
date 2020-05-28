@@ -3,6 +3,8 @@ import pymysql
 
 
 def execute():
+
+    database = os.getcwd() + "\..\sql\podroze_db.sql"
     connection = pymysql.Connect(
         host='localhost',
         user=os.getenv("DB_USERNAME"),
@@ -13,23 +15,28 @@ def execute():
     )
 
     try:
-        db_info = connection.get_server_info()
-        print("Connected to MySQL Server version ", db_info)
-        cursor = connection.cursor()
-        cursor.execute("select database();")
-        record = cursor.fetchone()
-        print("You're connected to database: ", record)
+        with connection.cursor() as cursor:
+            db_info = connection.get_server_info()
+            print("Connected to MySQL Server version ", db_info)
+            cursor.execute("select database();")
+            record = cursor.fetchone()
+            print("You're connected to database: ", record)
 
     except pymysql.Error as e:
         print("Error while connecting to MySQL", e)
-        for line in open("podroze_db.sql"):
-            connection.cursor.execute(line)
+        with open(database) as fp:
+            line = fp.readline()
+            cnt = 0
+            while line:
+                print("Line {}: {}".format(cnt, line.strip()))
+                line = fp.readline()
+                cnt += 1
+                cursor.execute(line)
     finally:
         return connection
 
 
 def test():
-    connection = execute()
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT id_klienta FROM Klient WHERE id_klienta=1")

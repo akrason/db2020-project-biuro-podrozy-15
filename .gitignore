@@ -1,7 +1,6 @@
 **/out/
 **/.idea/
 
-.env
 
 *.iml
 *.pyc
