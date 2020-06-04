@@ -36,11 +36,13 @@ def execute():
         return connection
 
 
-def test(id):
+def test(kraj):
     connection = execute()
     try:
         with connection.cursor() as cursor:
-            func= ("SELECT * FROM Klient WHERE id_klienta=%d")% id
+            func= ("SELECT kraj,miasto,hotel.nazwa,hotel.nocleg_cena FROM miejsce \
+                 INNER JOIN hotel ON miejsce.id_miejsca = hotel.id_miejsca \
+                  WHERE kraj LIKE '%s'") % kraj
             cursor.execute(func)
 
             result = cursor.fetchall()
