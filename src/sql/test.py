@@ -36,11 +36,12 @@ def execute():
         return connection
 
 
-def test():
+def test(id):
     connection = execute()
     try:
         with connection.cursor() as cursor:
-            cursor.execute("SELECT id_klienta FROM Klient WHERE id_klienta=1")
+            func= ("SELECT * FROM Klient WHERE id_klienta=%d")% id
+            cursor.execute(func)
 
             result = cursor.fetchall()
 
