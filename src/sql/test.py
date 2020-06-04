@@ -4,7 +4,7 @@ import pymysql
 
 def execute():
 
-    database = os.getcwd() + "\..\sql\podroze_db.sql"
+    database = os.getcwd() + "podroze_db.sql"
     connection = pymysql.Connect(
         host='localhost',
         user=os.getenv("DB_USERNAME"),
@@ -37,6 +37,7 @@ def execute():
 
 
 def test():
+    connection = execute()
     try:
         with connection.cursor() as cursor:
             cursor.execute("SELECT id_klienta FROM Klient WHERE id_klienta=1")
