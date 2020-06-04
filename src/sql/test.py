@@ -40,7 +40,7 @@ def test(kraj):
     connection = execute()
     try:
         with connection.cursor() as cursor:
-            func= ("SELECT kraj,miasto,hotel.nazwa,hotel.nocleg_cena FROM miejsce \
+            func = ("SELECT kraj,miasto,hotel.nazwa,hotel.nocleg_cena FROM miejsce \
                  INNER JOIN hotel ON miejsce.id_miejsca = hotel.id_miejsca \
                   WHERE kraj LIKE '%s'") % kraj
             cursor.execute(func)
