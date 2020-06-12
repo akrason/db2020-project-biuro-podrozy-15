@@ -143,15 +143,21 @@ INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES 
 INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (23, 160, 4, 'TeoDorka');
 INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (24, 60, 11, 'Ohto');
 
-INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (1, null, 'samolot', 'Warszawa');
-INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (2, null, 'pociąg', 'Kraków');
-INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (3, null, 'samolot', 'Kraków');
-INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (4, null, 'statek', 'Gdańsk');
-INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (5, null, 'samolot', 'Gdańsk');
-INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (6, null, 'samolot', 'Katowice');
-INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (7, null, 'statek', 'Szczecin');
-INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (8, null, 'pociąg', 'Kraków');
-INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (9, null, 'pociąg', 'Warszawa');
-INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (10, null, 'pociąg', 'Wrocław');
+INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (1, 750, 'samolot', 'Warszawa');
+INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (2, 40, 'pociąg', 'Kraków');
+INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (3, 650, 'samolot', 'Kraków');
+INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (4, 200, 'statek', 'Gdańsk');
+INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (5, 700, 'samolot', 'Gdańsk');
+INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (6, 600, 'samolot', 'Katowice');
+INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (7, 150, 'statek', 'Szczecin');
+INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (8, 24, 'pociąg', 'Kraków');
+INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (9, 31.5, 'pociąg', 'Warszawa');
+INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transportu, miejsce_wyjazdu) VALUES (10, 48.2, 'pociąg', 'Wrocław');
 
+INSERT INTO podroze_db.oferta(id_oferty, cena, ilosc_miejsc, id_miejsca, id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (1,14*219+2*600,36,7,6,18,'2020-07-03 14:30:00','2020-07-17 19:00:00');
+INSERT INTO podroze_db.oferta(id_oferty, cena, ilosc_miejsc, id_miejsca, id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (2,14*152+2*750,36,8,1,10,'2020-07-10 16:30:00','2020-07-24 09:00:00');
+INSERT INTO podroze_db.oferta(id_oferty, cena, ilosc_miejsc, id_miejsca, id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (3,7*273+2*40,20,3,2,9,'2020-07-03 14:30:00','2020-07-10 19:00:00');
+INSERT INTO podroze_db.oferta(id_oferty, cena, ilosc_miejsc, id_miejsca, id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (4,14*199+2*650,46,8,3,22,'2020-07-30 9:30:00','2020-08-13 19:45:00');
+
+ 
 COMMIT;
