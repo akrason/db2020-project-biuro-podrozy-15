@@ -17,10 +17,7 @@ def execute():
     try:
         with connection.cursor() as cursor:
             db_info = connection.get_server_info()
-            print("Connected to MySQL Server version ", db_info)
             cursor.execute("select database();")
-            record = cursor.fetchone()
-            print("You're connected to database: ", record)
 
     except pymysql.Error as e:
         print("Error while connecting to MySQL", e)
@@ -57,5 +54,23 @@ def test(kraj):
             for f in result:
                 print(f)
 
+    finally:
+        connection.close()
+
+
+def show_offers():
+    connection = execute()
+    try:
+        with connection.cursor() as cursor:
+            sql = ("SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, \
+                data_powrotu FROM oferta o \
+                LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca \
+                INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu \
+                INNER JOIN transport t ON t.id_transportu = o.id_transportu;")
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            print("Dostępne oferty: ")
+            for f in result:
+                print(f)
     finally:
         connection.close()
