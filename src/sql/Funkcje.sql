@@ -27,7 +27,7 @@ ROLLBACK;
 --dodanie nowego miejsca
 BEGIN;
 INSERT INTO podroze_db.miejsce (kraj, miasto) VALUES ( '%s', '%s');
-SELECT kraj,miasto FROM klient WHERE kraj = "%s" AND miasto = "%s";
+SELECT kraj,miasto FROM miejsce WHERE kraj = "%s" AND miasto = "%s";
 --czy na pewno chcesz wprowadzic zmiany?
 --tak
 COMMIT;

@@ -74,3 +74,41 @@ def show_offers():
                 print(f)
     finally:
         connection.close()
+
+
+def test_update(kraj,miasto):
+    connection = execute()
+    try:
+        with connection.cursor() as cursor:
+            sql = ("INSERT INTO podroze_db.miejsce (kraj, miasto) VALUES ( '%s', '%s');") % (kraj, miasto)
+            cursor.execute(sql)
+            sql1 =("SELECT kraj,miasto FROM miejsce WHERE kraj = '%s' AND miasto = '%s';") % (kraj, miasto)
+
+            cursor.execute(sql1)
+            result = cursor.fetchall()
+            print("Zmiany:")
+
+            for f in result:
+                print(f)
+
+            ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
+            if ask == "Y":
+                connection.commit()
+                do_testu()
+            else:
+                connection.rollback()
+                do_testu()
+    finally:
+        connection.close()
+
+def do_testu():
+    connection = execute()
+    try:
+        with connection.cursor() as cursor:
+            sql = ("SElECT * FROM miejsce")
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            for f in result:
+                print(f)
+    finally:
+        connection.close()
