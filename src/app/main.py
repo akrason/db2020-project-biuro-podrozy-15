@@ -6,6 +6,8 @@ from PyQt5.QtCore import Qt
 
 api.execute()
 api.test("Hiszpania")
+api.show_offers()
+api.test_update("Francja", "Saint Tropez")
 
 
 if __name__ == '__main__':
