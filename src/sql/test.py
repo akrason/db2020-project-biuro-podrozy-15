@@ -3,7 +3,6 @@ import pymysql
 
 
 def execute():
-
     database = os.getcwd() + "podroze_db.sql"
     connection = pymysql.Connect(
         host='localhost',
@@ -33,12 +32,11 @@ def execute():
         return connection
 
 
-def test(kraj):
+def find_place(kraj):
     connection = execute()
     try:
         with connection.cursor() as cursor:
-            func = ("SELECT kraj,miasto,hotel.nazwa,hotel.nocleg_cena FROM miejsce \
-                 INNER JOIN hotel ON miejsce.id_miejsca = hotel.id_miejsca \
+            func = ("SELECT kraj,miasto FROM miejsce \
                   WHERE kraj LIKE '%s'") % kraj
             cursor.execute(func)
 
@@ -46,13 +44,6 @@ def test(kraj):
 
             for x in result:
                 print(x)
-
-        with connection.cursor() as cursor:
-            sql = "SHOW TABLES"
-            cursor.execute(sql)
-            result = cursor.fetchall()
-            for f in result:
-                print(f)
 
     finally:
         connection.close()
@@ -70,25 +61,43 @@ def show_offers():
             cursor.execute(sql)
             result = cursor.fetchall()
             print("Dostępne oferty: ")
+            i = 1
+            for f in result:
+                print(i, ".", f)
+                i += 1
+    finally:
+        connection.close()
+
+
+def show_places():
+    connection = execute()
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM miejsce;"
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            print("Miejsca znajdujące się w bazie: ")
             for f in result:
                 print(f)
     finally:
         connection.close()
 
 
-def show_places():
-    def show_offers():
-        connection = execute()
-        try:
-            with connection.cursor() as cursor:
-                sql = ("SELECT * FROM miejsce;")
-                cursor.execute(sql)
-                result = cursor.fetchall()
-                print("Miejsca znajdujące się w bazie: ")
-                for f in result:
-                    print(f)
-        finally:
-            connection.close()
+def show_hotels(miejsce):
+    connection = execute()
+    try:
+        with connection.cursor() as cursor:
+            sql = ("SELECT kraj,miasto,hotel.nazwa,hotel.nocleg_cena FROM miejsce\
+            INNER JOIN hotel ON miejsce.id_miejsca = hotel.id_miejsca\
+            WHERE kraj LIKE '%s';") % miejsce
+            cursor.execute(sql)
+            result = cursor.fetchall()
+
+            for x in result:
+                print(x)
+
+    finally:
+        connection.close()
 
 
 def add_place():
@@ -98,9 +107,9 @@ def add_place():
 
     try:
         with connection.cursor() as cursor:
-            sql = ("INSERT INTO podroze_db.miejsce (kraj, miasto) VALUES ( '%s', '%s');") % (kraj, miasto)
+            sql = "INSERT INTO podroze_db.miejsce (kraj, miasto) VALUES ( '%s', '%s');" % (kraj, miasto)
             cursor.execute(sql)
-            sql1 =("SELECT kraj,miasto FROM miejsce WHERE kraj = '%s' AND miasto = '%s';") % (kraj, miasto)
+            sql1 = "SELECT kraj,miasto FROM miejsce WHERE kraj = '%s' AND miasto = '%s';" % (kraj, miasto)
 
             cursor.execute(sql1)
             result = cursor.fetchall()
@@ -115,7 +124,7 @@ def add_place():
                 connection.commit()
             else:
                 connection.rollback()
-                fix_autoincrement(miasto,'miejsce')
+                fix_autoincrement('id_miejsca', 'miejsce')
     finally:
         connection.close()
 
@@ -124,17 +133,22 @@ def fix_autoincrement(var1, var2):
     connection = execute()
     try:
         with connection.cursor() as cursor:
-            sql = ("SELECT MAX('%s') FROM %s")%(var1,var2)
+            sql = "SELECT MAX(%s) FROM %s" % (var1, var2)
             cursor.execute(sql)
             result = cursor.fetchall()
-            sql1=("ALTER TABLE '%s' AUTO_INCREMENT = result")%var2
+            key = list(result[0].keys())
+            key = key[0]
+            sql1 = "ALTER TABLE %s AUTO_INCREMENT = %d" % (var2, result[0][key])
             cursor.execute(sql1)
+            cursor.commit()
 
     finally:
         connection.close()
 
 
 def add_hotel():
+    connection = execute()
+
     nazwa = input("Podaj nazwę hotelu: ")
     cena = input("Podaj cenę za nocleg: ")
     show_places()
@@ -142,17 +156,14 @@ def add_hotel():
     if q1 == "N":
         add_place()
     elif q1 == "Y":
-        miejsce = input("Podaj id miejsca: ")
-
-    connection = execute()
+        miejsce = int(input("Podaj id miejsca: "))
 
     try:
         with connection.cursor() as cursor:
             sql = ("INSERT INTO podroze_db.hotel (nocleg_cena, id_miejsca, nazwa) \
             VALUES ( '%s', %d,'%s');") % (cena, miejsce, nazwa)
             cursor.execute(sql)
-            cursor.execute(sql)
-            sql1 = ("SELECT nocleg_cena, nazwa FROM hotel WHERE nazwa = '%s';") % (nazwa)
+            sql1 = "SELECT nocleg_cena, nazwa FROM hotel WHERE nazwa = '%s';" % nazwa
 
             cursor.execute(sql1)
             result = cursor.fetchall()
@@ -167,18 +178,64 @@ def add_hotel():
                 connection.commit()
             else:
                 connection.rollback()
-                fix_autoincrement(nazwa, 'hotel')
+                fix_autoincrement('id_hotelu', 'hotel')
     finally:
         connection.close()
+
+
+def add_offer():
+    connection = execute()
+
+    ilosc = int(input("Podaj ilość dostępnych miejsc: "))
+    show_places()
+    miejsce = int(input("Podaj id miejsca: "))
+    data_w = input("Data wyjazdu: ")
+    data_p = input("Data powrotu: ")
+    transport = 11
+
+    try:
+        with connection.cursor() as cursor:
+            sql = ("SELECT id_hotelu,nazwa,nocleg_cena FROM hotel \
+            LEFT JOIN miejsce m ON m.id_miejsca = hotel.id_miejsca;")
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            print("Baza hoteli w danym miejscu: ")
+            for f in result:
+                print(f)
+
+        hotel = int(input("Podaj id hotelu: "))
+
+        with connection.cursor() as cursor:
+            sql = "SELECT nocleg_cena FROM hotel WHERE id_hotelu = %d;" % hotel
+            cursor.execute(sql)
+            hotel_cena = cursor.fetchall()
+            hotel_cena = hotel_cena['nocleg_cena']
+
+        cena = 14 * hotel_cena
+
+        with connection.cursor() as cursor:
+            sql = ("INSERT INTO podroze_db.oferta(cena, ilosc_miejsc, id_miejsca,\
+            id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (%d,%d,%d,%d,%d,%s,%s);") \
+                  % (cena, ilosc, miejsce, transport, hotel, data_w, data_p)
+            cursor.execute(sql)
+
+            ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
+            if ask == "Y":
+                connection.commit()
+            else:
+                connection.rollback()
+                fix_autoincrement('id_oferty', 'oferta')
+    finally:
+        connection.close()
+
 
 def login_klient(nazwa):
     connection = execute()
     try:
         with connection.cursor() as cursor:
-            sql = ("SELECT email,haslo FROM klient")
+            sql = "SELECT email,haslo FROM klient"
             cursor.execute(sql)
             result = cursor.fetchall()
-            print("Dostępne oferty: ")
             for f in result:
                 if nazwa == f['email']:
                     x = True
@@ -194,7 +251,6 @@ def login_klient(nazwa):
                 return 2
             else:
                 return 3
-
 
     finally:
         connection.close()
