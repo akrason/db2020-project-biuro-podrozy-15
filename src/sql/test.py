@@ -76,8 +76,26 @@ def show_offers():
         connection.close()
 
 
-def test_update(kraj,miasto):
+def show_places():
+    def show_offers():
+        connection = execute()
+        try:
+            with connection.cursor() as cursor:
+                sql = ("SELECT * FROM miejsce;")
+                cursor.execute(sql)
+                result = cursor.fetchall()
+                print("Miejsca znajdujące się w bazie: ")
+                for f in result:
+                    print(f)
+        finally:
+            connection.close()
+
+
+def add_place():
     connection = execute()
+    kraj = input("Podaj państwo jakie chcesz dodać: ")
+    miasto = input("Podaj miasto jakie chcesz dodać: ")
+
     try:
         with connection.cursor() as cursor:
             sql = ("INSERT INTO podroze_db.miejsce (kraj, miasto) VALUES ( '%s', '%s');") % (kraj, miasto)
@@ -86,6 +104,7 @@ def test_update(kraj,miasto):
 
             cursor.execute(sql1)
             result = cursor.fetchall()
+
             print("Zmiany:")
 
             for f in result:
@@ -94,21 +113,88 @@ def test_update(kraj,miasto):
             ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
             if ask == "Y":
                 connection.commit()
-                do_testu()
             else:
                 connection.rollback()
-                do_testu()
+                fix_autoincrement(miasto,'miejsce')
     finally:
         connection.close()
 
-def do_testu():
+
+def fix_autoincrement(var1, var2):
     connection = execute()
     try:
         with connection.cursor() as cursor:
-            sql = ("SElECT * FROM miejsce")
+            sql = ("SELECT MAX('%s') FROM %s")%(var1,var2)
             cursor.execute(sql)
             result = cursor.fetchall()
+            sql1=("ALTER TABLE '%s' AUTO_INCREMENT = result")%var2
+            cursor.execute(sql1)
+
+    finally:
+        connection.close()
+
+
+def add_hotel():
+    nazwa = input("Podaj nazwę hotelu: ")
+    cena = input("Podaj cenę za nocleg: ")
+    show_places()
+    q1 = input("Czy miejsce znajduje się w bazie? (Y/N)")
+    if q1 == "N":
+        add_place()
+    elif q1 == "Y":
+        miejsce = input("Podaj id miejsca: ")
+
+    connection = execute()
+
+    try:
+        with connection.cursor() as cursor:
+            sql = ("INSERT INTO podroze_db.hotel (nocleg_cena, id_miejsca, nazwa) \
+            VALUES ( '%s', %d,'%s');") % (cena, miejsce, nazwa)
+            cursor.execute(sql)
+            cursor.execute(sql)
+            sql1 = ("SELECT nocleg_cena, nazwa FROM hotel WHERE nazwa = '%s';") % (nazwa)
+
+            cursor.execute(sql1)
+            result = cursor.fetchall()
+
+            print("Zmiany:")
+
             for f in result:
                 print(f)
+
+            ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
+            if ask == "Y":
+                connection.commit()
+            else:
+                connection.rollback()
+                fix_autoincrement(nazwa, 'hotel')
+    finally:
+        connection.close()
+
+def login_klient(nazwa):
+    connection = execute()
+    try:
+        with connection.cursor() as cursor:
+            sql = ("SELECT email,haslo FROM klient")
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            print("Dostępne oferty: ")
+            for f in result:
+                if nazwa == f['email']:
+                    x = True
+                    passwd = input("Podaj hasło: ")
+                    if passwd == f['haslo']:
+                        return 1
+                    else:
+                        print("Błędne hasło")
+                    break
+                else:
+                    x = False
+            if not x:
+                return 2
+            else:
+                return 3
+
+
     finally:
         connection.close()
