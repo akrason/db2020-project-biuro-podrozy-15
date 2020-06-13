@@ -16,7 +16,8 @@ create table klient
     imie        varchar(30)     not null,
     nazwisko    varchar(30)     not null,
     email       varchar(50)     not null,
-    nr_telefonu int(9) unsigned not null
+    nr_telefonu int(9) unsigned not null,
+    haslo varchar(30) not null
 );
 
 create table miejsce
@@ -94,16 +95,16 @@ CREATE INDEX id_oferty
     ON rezerwacja (id_oferty);
 
 
-INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (1, 'Geralt', 'z Rivii', 'rzeznikzBlaviken@gmail.com', 234765894);
-INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (2, 'Triss', 'Merigold', 'czarymary@temeria.org', 123456789);
-INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (3, 'Yennefer', 'z Vengerbergu', 'szybkabryka78@brrrum.com', 859473665);
-INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (4, 'Cirilla', 'Riannon', 'kindersurprajs@muuu.me', 958447337);
-INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (5, 'Radowid', 'Srogi', 'wiecznyogien@onet.re', 684495865);
-INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (6, 'Harry', 'Potter', 'blyskawica15@gmail.com', 152635178);
-INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (7, 'Bilbo', 'Baggins', 'myprecious@interia.org', 185356629);
-INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (8, 'Gandalf', 'Szary', 'ushallnot@pass.com', 965187264);
-INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (9, 'Albus', 'Dumbledore', 'cytrynowe@dropsy.me', 189347512);
-INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu) VALUES (10, 'Paul', 'Walker', 'czerwonastrzala@onet.re', 665798246);
+INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu,haslo) VALUES (1, 'Geralt', 'z Rivii', 'rzeznikzBlaviken@gmail.com', 234765894,'1a2s');
+INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu,haslo) VALUES (2, 'Triss', 'Merigold', 'czarymary@temeria.org', 123456789, '3d4f');
+INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu,haslo) VALUES (3, 'Yennefer', 'z Vengerbergu', 'szybkabryka78@brrrum.com', 859473665,'2s4f');
+INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu,haslo) VALUES (4, 'Cirilla', 'Riannon', 'kindersurprajs@muuu.me', 958447337,'3d6h');
+INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu,haslo) VALUES (5, 'Radowid', 'Srogi', 'wiecznyogien@onet.re', 684495865,'1a7j');
+INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu,haslo) VALUES (6, 'Harry', 'Potter', 'blyskawica15@gmail.com', 152635178,'3d9l');
+INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu,haslo) VALUES (7, 'Bilbo', 'Baggins', 'myprecious@interia.org', 185356629,'1a6h');
+INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu,haslo) VALUES (8, 'Gandalf', 'Szary', 'ushallnot@pass.com', 965187264,'1a8k');
+INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu,haslo) VALUES (9, 'Albus', 'Dumbledore', 'cytrynowe@dropsy.me', 189347512,'2s5g');
+INSERT INTO podroze_db.klient (id_klienta, imie, nazwisko, email, nr_telefonu,haslo) VALUES (10, 'Paul', 'Walker', 'czerwonastrzala@onet.re', 665798246, '4f2s');
 
 INSERT INTO podroze_db.miejsce (id_miejsca, kraj, miasto) VALUES (1, 'Polska', 'Zakopane');
 INSERT INTO podroze_db.miejsce (id_miejsca, kraj, miasto) VALUES (2, 'Polska', 'Gdańsk');
