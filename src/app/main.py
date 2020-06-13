@@ -17,6 +17,9 @@ def panel_klienta():
 1. Dostępne oferty
 2. Wyszukaj miejsce
 3. Wykonaj rezerwacje""")
+    ask = int(input("Wybierz jedną z opcji: \n"))
+    if ask == 1:
+        api.show_offers()
 
 
 def start():
@@ -38,6 +41,7 @@ def start():
         value = api.login_klient(nazwa)
         if value == 1:
             print("Zostałeś zalogowany")
+            panel_klienta()
         elif value == 2:
             print("Nie ma takie użytkownika w bazie. Spróbuj jeszcze raz lub zarejestruj się")
         else:
@@ -49,4 +53,6 @@ def start():
 
 if __name__ == '__main__':
     import sys
+
     start()
+
