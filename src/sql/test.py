@@ -57,8 +57,37 @@ def show_offers():
                 data_powrotu FROM oferta o \
                 LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca \
                 INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu \
-                INNER JOIN transport t ON t.id_transportu = o.id_transportu;")
+                INNER JOIN transport t ON t.id_transportu = o.id_transportu")
+
+            print("""Sortuj według:
+            1. Cena(najniższa)
+            2. Cena(najwyższa)
+            3. Miejsce(od A do Z)
+            4. Miejsce(od Z do A)
+            5. Najpopularniejsze
+            6. Najmniej popularne""")  # popularność group by rezerwacje
+            ask = int(input(""))
+            if ask == 1:
+                add = ' ORDER BY cena;'
+                sql = sql + add
+                print(sql)
             cursor.execute(sql)
+            if ask == 2:
+                add = ' ORDER BY cena DESC;'
+                sql = sql + add
+                print(sql)
+            cursor.execute(sql)
+            if ask == 3:
+                add = ' ORDER BY miasto;'
+                sql = sql + add
+                print(sql)
+            cursor.execute(sql)
+            if ask == 4:
+                add = ' ORDER BY miasto DESC;'
+                sql = sql + add
+                print(sql)
+            cursor.execute(sql)
+
             result = cursor.fetchall()
             print("Dostępne oferty: ")
             i = 1
@@ -151,6 +180,7 @@ def add_hotel():
 
     nazwa = input("Podaj nazwę hotelu: ")
     cena = input("Podaj cenę za nocleg: ")
+    miejsce = -1
     show_places()
     q1 = input("Czy miejsce znajduje się w bazie? (Y/N)")
     if q1 == "N":
@@ -254,3 +284,79 @@ def login_klient(nazwa):
 
     finally:
         connection.close()
+
+
+def add_user():
+    connection = execute()
+
+    print("Podaj swoje dane.")
+    email = input("Adres e-mail: ")
+    haslo1 = input("Podaj hasło: ")
+    haslo2 = input("Powtórz hasło: ")
+    while haslo1 != haslo2:
+        print("Podane hasła różnią się")
+        haslo1 = input("Podaj hasło: ")
+        haslo2 = input("Powtórz hasło: ")
+    imie = input("Imię: ")
+    nazwisko = input("Nazwisko: ")
+    nr = int(input("Nr telefonu: "))
+
+    sql = "INSERT INTO podroze_db.klient(imie, nazwisko, email,\
+            nr_telefonu, haslo) VALUES ('%s', '%s', '%s', '%d', '%s')" % \
+          (imie, nazwisko, email, nr, haslo1)
+
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute(sql)
+
+            ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
+            if ask == "Y":
+                connection.commit()
+            else:
+                connection.rollback()
+    finally:
+        connection.close()
+
+
+def add_reservation():
+    connection = execute()
+
+    try:
+        with connection.cursor() as cursor:
+            sql = ""
+            cursor.execute(sql)
+
+            ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
+            if ask == "Y":
+                connection.commit()
+            else:
+                connection.rollback()
+    finally:
+        connection.close()
+
+
+def my_reservations(email):
+    connection = execute()
+
+    try:
+        with connection.cursor() as cursor:
+            sql = ("SELECT klient.imie, klient.nazwisko, miejsce.kraj, miejsce.miasto,\
+            hotel.nazwa, rezerwacja.liczba_osob, rezerwacja.data_rezerwacji,\
+            oferta.data_wyjazdu, oferta.data_powrotu, oferta.cena,\
+            transport.typ_transportu, transport.miejsce_wyjazdu FROM klient\
+            INNER JOIN rezerwacja ON rezerwacja.id_klienta=klient.id_klienta\
+            INNER JOIN oferta ON rezerwacja.id_oferty=oferta.id_oferty\
+            INNER JOIN transport ON oferta.id_transportu=transport.id_transportu\
+            INNER JOIN hotel ON oferta.id_hotelu=hotel.id_hotelu\
+            INNER JOIN miejsce ON hotel.id_miejsca=miejsce.id_miejsca WHERE klient.email = '%s';") % email
+            cursor.execute(sql)
+
+            result = cursor.fetchall()
+            print("Moje rezerwacje: ")
+            for f in result:
+                print(f)
+
+            connection.commit()
+    finally:
+        connection.close()
+
