@@ -309,7 +309,7 @@ def login_klient(nazwa):
     connection = execute()
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT email,haslo FROM klient"
+            sql = "SELECT email, haslo FROM klient"
             cursor.execute(sql)
             result = cursor.fetchall()
             for f in result:
@@ -353,14 +353,20 @@ def add_user():
 
     try:
         with connection.cursor() as cursor:
-            cursor.execute(sql)
-
-            ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
-            if ask == "Y":
-                connection.commit()
+            sql2 = "SELECT email FROM klient WHERE email = '%s'" % email
+            cursor.execute(sql2)
+            result = cursor.fetchall()
+            if result:
+                print("Użytkownik o podanym adresie e-mail już istnieje!")
             else:
-                connection.rollback()
-                fix_autoincrement("id_klienta", "klient")
+                cursor.execute(sql)
+
+                ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
+                if ask == "Y":
+                    connection.commit()
+                else:
+                    connection.rollback()
+                    fix_autoincrement("id_klienta", "klient")
     finally:
         connection.close()
 
@@ -543,7 +549,7 @@ def update_payment():
     connection = execute()
     try:
         with connection.cursor() as cursor:
-            sql = "SELECT * FROM rezerwacja Where id_klienta = %d"%klient
+            sql = "SELECT * FROM rezerwacja WHERE id_klienta = %d" % klient
             cursor.execute(sql)
 
             result = cursor.fetchall()
@@ -567,7 +573,7 @@ def delete_res():
         with connection.cursor() as cursor:
 
             klient = int(input("Podaj id klienta: "))
-            sql = "SELECT * FROM rezerwacja Where id_klienta = %d" % klient
+            sql = "SELECT * FROM rezerwacja WHERE id_klienta = %d" % klient
             cursor.execute(sql)
 
             result = cursor.fetchall()

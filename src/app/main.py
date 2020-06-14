@@ -7,7 +7,6 @@ import sys
 def start():
     run = 1
     print(""" Witaj!
-    
 1. Logowanie do panelu pracownika
 2. Logowanie jako klient
 3. Rejestracja

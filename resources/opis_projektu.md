@@ -176,7 +176,7 @@ INSERT INTO podroze_db.miejsce (kraj, miasto) VALUES ( 'Polska', 'Sandomierz');
 SELECT kraj,miasto FROM miejsce WHERE kraj = 'Polska' AND miasto = 'Sandomierz';
 ```
 
-[12]
+[12].Dodawanie nowego hotelu do bazy
 ```sql
 INSERT INTO podroze_db.hotel (nocleg_cena, id_miejsca, nazwa) VALUES ( 315, 5,'Mały Rzym');
 ```
@@ -185,10 +185,153 @@ INSERT INTO podroze_db.hotel (nocleg_cena, id_miejsca, nazwa) VALUES ( 315, 5,'M
 SELECT nocleg_cena, nazwa FROM hotel WHERE nazwa = 'Mały Rzym';
 ```
 
-[13].
+[13].Dodawanie nowej oferty do bazy (początkowe wyświetlenie hoteli w danym miejscu w celu wyboru istniejącego lub dodanie nowego)
 ```sql
-
+SELECT id_hotelu,nazwa,nocleg_cena FROM hotel WHERE id_miejsca = 3;
 ```
+- uzyskanie ceny doby w wybranym hotelu
+```sql
+SELECT nocleg_cena FROM hotel WHERE id_hotelu = 2;
+```
+- uzyskanie ceny wybranego transportu
+```sql
+SELECT koszt_transportu FROM transport WHERE id_transportu = 1;
+```
+- uzyskanie liczby dni danego wyjazdu do obliczenia całkowitej ceny oferty
+```sql
+SELECT DATEDIFF(2020-06-24 13:30:00, 2020-06-19 19:00:00);
+```
+- dodanie nowej oferty do bazy
+```sql
+INSERT INTO podroze_db.oferta(cena, ilosc_miejsc, id_miejsca,
+id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES
+(2056.78, 45, 3, 2, 6, 2020-06-19 19:00:00, 2020-06-24 13:30:00);
+```
+- żądanie zatwierdzenia wprowadzenia zmian
+
+[14].Logowanie się przez klienta <p>
+- odczytanie bazy w celu porównania z danymi z logowania
+```sql
+"SELECT email, haslo FROM klient"
+```
+
+[15].Dodawanie uzytkownika <p>
+- sprawdzenie czy klient z podanym adresem email już istnieje
+```sql
+SELECT email FROM klient WHERE email = rad@polon.fr
+```
+- utworzenie klienta o podanych danych w bazie
+```sql
+INSERT INTO podroze_db.klient(imie, nazwisko, email, nr_telefonu, haslo) 
+VALUES ('Marie', 'Curie', 'rad@polon.fr', 124563564, '123e');
+```
+
+[16].Utworzenie rezerwacji przez klienta 
+- na podstawie podanej liczby osób przez klienta wyświetlane są oferty, w których jest wystarczająco miejsc
+```sql
+SELECT o.id_oferty,m.kraj, m.miasto, h.nazwa,  cena, data_wyjazdu, data_powrotu FROM oferta o
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu
+WHERE o.ilosc_miejsc >= 5;
+```
+- uzyskanie id klienta o podanym adresie e-mail
+```sql
+SELECT id_klienta FROM klient
+WHERE klient.email = 'szybkabryka@gmail.com';
+```
+- utworzenie nowej rezerwacji w bazie
+```sql
+INSERT INTO podroze_db.rezerwacja (liczba_osob, data_rezerwacji,
+platnosc, id_klienta, id_oferty) VALUES (4, LOCALTIME(), 0, 7, 3);
+```
+- sprawdzenie dostępnej liczby miejsc w danej ofercie
+```sql
+SELECT ilosc_miejsc FROM oferta WHERE id_oferty = 3;
+```
+- pomniejszenie liczby wolnych miejsc o liczbę zarezerwowaną
+```sql
+UPDATE oferta SET ilosc_miejsc = 53 WHERE id_oferty = 3;
+```
+- żądanie zatwierdzenia wprowadzenia zmian
+
+[17].Wycofanie rezerwacji
+- wyświetlenie rezerwacji klienta
+```sql
+SELECT rezerwacja.id_rezerwacji, klient.imie, klient.nazwisko, miejsce.kraj, miejsce.miasto,
+hotel.nazwa, rezerwacja.liczba_osob, rezerwacja.data_rezerwacji, oferta.data_wyjazdu,
+oferta.data_powrotu, oferta.cena, transport.typ_transportu, transport.miejsce_wyjazdu FROM klient
+INNER JOIN rezerwacja ON rezerwacja.id_klienta=klient.id_klienta
+INNER JOIN oferta ON rezerwacja.id_oferty=oferta.id_oferty
+INNER JOIN transport ON oferta.id_transportu=transport.id_transportu
+INNER JOIN hotel ON oferta.id_hotelu=hotel.id_hotelu
+INNER JOIN miejsce ON hotel.id_miejsca=miejsce.id_miejsca WHERE klient.email = 'rad@polon.fr';
+```
+- sprawdzenie statusu płatności rezerwacji (możliwość wycofania tylko nieopłaconych)
+```sql
+SELECT platnosc FROM rezerwacja INNER JOIN klient ON rezerwacja.id_klienta =
+klient.id_klienta WHERE klient.email = 'rad@polon.fr'
+AND rezerwacja.id_rezerwacji = 7;
+```
+- sprawdzenie liczby osób w rezerwacji
+```sql
+SELECT liczba_osob FROM rezerwacja
+WHERE id_rezerwacji = 7;
+```
+- sprawdzenie id oferty w rezerwacji
+```sql
+SELECT rezerwacja.id_oferty FROM rezerwacja
+WHERE id_rezerwacji = 7;
+```
+- usunięcie rezerwacji
+```sql
+DELETE FROM rezerwacja WHERE id_rezerwacji = 7;
+```
+- zwiększenie liczby wolnych miejsc w ofercie
+```sql
+UPDATE oferta SET ilosc_miejsc = 55
+WHERE id_oferty = 3;
+```
+- żądanie zatwierdzenia wprowadzenia zmian
+
+[18].Wyświetlenie własnych rezerwacji
+```sql
+SELECT klient.imie, klient.nazwisko, miejsce.kraj, miejsce.miasto,
+hotel.nazwa, rezerwacja.liczba_osob, rezerwacja.data_rezerwacji,
+oferta.data_wyjazdu, oferta.data_powrotu, oferta.cena,
+transport.typ_transportu, transport.miejsce_wyjazdu FROM klient
+INNER JOIN rezerwacja ON rezerwacja.id_klienta=klient.id_klienta
+INNER JOIN oferta ON rezerwacja.id_oferty=oferta.id_oferty
+INNER JOIN transport ON oferta.id_transportu=transport.id_transportu
+INNER JOIN hotel ON oferta.id_hotelu=hotel.id_hotelu
+INNER JOIN miejsce ON hotel.id_miejsca=miejsce.id_miejsca WHERE klient.email = 'rad@polon.fr';
+```
+
+[19].Zaktualizowanie ceny noclegu w hotelu przez pracownika
+```sql
+UPDATE hotel SET nocleg_cena = 543.56 WHERE id_hotelu = 3;
+```
+- żądanie zatwierdzenia wprowadzenia zmian
+
+[20].Zmiana statusu opłacenia rezerwacji 
+- wyświetlenie rezerwacji wybranego klienta
+```sql
+SELECT * FROM rezerwacja WHERE id_klienta = 3;
+```
+- zmiana statusu płatności wybranej rezerwacji
+```sql
+UPDATE rezerwacja SET platnosc = 1 WHERE id_rezerwacji = 7;
+```
+
+[21]. Usunięcie rezerwacji przez pracownika 
+- wyświetlenie rezerwacji wybranego klienta
+```sql
+SELECT * FROM rezerwacja WHERE id_klienta = 3;
+```
+- usunięcie rezerwacji
+```sql
+DELETE FROM rezerwacja WHERE id_rezerwacji = 7;
+```
+- żądanie zatwierdzenia wprowadzenia zmian
 
 ## Aplikacja
 W aplikacji menu startowe zawiera opcje:
