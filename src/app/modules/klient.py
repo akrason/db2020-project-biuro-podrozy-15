@@ -8,7 +8,7 @@ def panel_klienta(email):
 2. Wyszukaj miejsce
 3. Wykonaj rezerwacje
 4. Moje rezerwacje
-OSTATNI. Wyjście""")
+5. Wyjście""")
     ask = int(input("Wybierz jedną z opcji: \n"))
     if ask == 1:
         api.show_offers()
@@ -19,9 +19,8 @@ OSTATNI. Wyjście""")
         if q1 == "Y":
             api.show_hotels(miejsce)
     elif ask == 3:
-        api.show_offers()
-        oferta = int(input("Którą ofertę wybierasz?"))
-        #tutaj insert rezerwacji ze zmiana transportu i zmiana ceny wtedy cena = dni* hotel + 2*transport
+        api.add_reservation(email)
+
     elif ask == 4:
         api.my_reservations(email)
     else:

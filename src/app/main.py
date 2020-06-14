@@ -4,6 +4,7 @@ import src.app.modules.pracownik as pracownik
 
 
 def start():
+    run = 1
     print(""" Witaj!
     
 1. Logowanie do panelu pracownika
@@ -15,7 +16,7 @@ def start():
     if ask == 1:
         haslo = input("Podaj hasło: ")
         if haslo == "podroze":
-            while 1:
+            while run ==1 :
                 pracownik.panel_pracownika()
         else:
             print("Błędne hasło")
@@ -44,4 +45,5 @@ def start():
 
 if __name__ == '__main__':
     import sys
-    start()
+    while 1:
+        start()

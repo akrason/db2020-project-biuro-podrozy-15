@@ -162,8 +162,16 @@ INSERT INTO podroze_db.transport (id_transportu, koszt_transportu, typ_transport
 INSERT INTO podroze_db.oferta(id_oferty, cena, ilosc_miejsc, id_miejsca, id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (1,14*219+2*600,36,7,6,18,'2020-07-03 14:30:00','2020-07-17 19:00:00');
 INSERT INTO podroze_db.oferta(id_oferty, cena, ilosc_miejsc, id_miejsca, id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (2,14*152+2*750,36,8,1,10,'2020-07-10 16:30:00','2020-07-24 09:00:00');
 INSERT INTO podroze_db.oferta(id_oferty, cena, ilosc_miejsc, id_miejsca, id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (3,7*273+2*40,20,3,2,9,'2020-07-03 14:30:00','2020-07-10 19:00:00');
-INSERT INTO podroze_db.oferta(id_oferty, cena, ilosc_miejsc, id_miejsca, id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (4,14*199+2*650,46,8,3,22,'2020-07-30 9:30:00','2020-08-13 19:45:00');
+INSERT INTO podroze_db.oferta(id_oferty, cena, ilosc_miejsc, id_miejsca, id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (4,14*60,46,11,11,24,'2020-07-30 9:30:00','2020-08-13 19:45:00');
+INSERT INTO podroze_db.oferta(id_oferty, cena, ilosc_miejsc, id_miejsca, id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (5,14*168+2*650,36,12,3,14,'2020-07-30 10:30:00','2020-08-13 23:45:00');
+INSERT INTO podroze_db.oferta(id_oferty, cena, ilosc_miejsc, id_miejsca, id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (6,14*160,52,4,11,23,'2020-07-30 11:30:00','2020-08-13 08:45:00');
 
 INSERT INTO podroze_db.rezerwacja (id_rezerwacji, liczba_osob, data_rezerwacji, platnosc, id_klienta, id_oferty) VALUES (1, 4, '2020-06-14 00:40:42', 0, 11, 2);
- 
+INSERT INTO podroze_db.rezerwacja (id_rezerwacji, liczba_osob, data_rezerwacji, platnosc, id_klienta, id_oferty) VALUES (2, 3, '2020-06-14 13:40:22', 0, 3, 4);
+INSERT INTO podroze_db.rezerwacja (id_rezerwacji, liczba_osob, data_rezerwacji, platnosc, id_klienta, id_oferty) VALUES (3, 5, '2020-06-03 18:30:15', 0, 4, 3);
+INSERT INTO podroze_db.rezerwacja (id_rezerwacji, liczba_osob, data_rezerwacji, platnosc, id_klienta, id_oferty) VALUES (4, 2, '2020-06-05 00:21:42', 0, 8, 2);
+INSERT INTO podroze_db.rezerwacja (id_rezerwacji, liczba_osob, data_rezerwacji, platnosc, id_klienta, id_oferty) VALUES (5, 2, '2020-06-14 04:00:00', 0, 10, 6);
+INSERT INTO podroze_db.rezerwacja (id_rezerwacji, liczba_osob, data_rezerwacji, platnosc, id_klienta, id_oferty) VALUES (6, 1, '2020-05-26 01:40:48', 0, 1, 5);
+INSERT INTO podroze_db.rezerwacja (id_rezerwacji, liczba_osob, data_rezerwacji, platnosc, id_klienta, id_oferty) VALUES (7, 4, '2020-05-17 21:27:42', 0, 5, 3);
+
 COMMIT;

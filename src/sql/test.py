@@ -65,29 +65,38 @@ def show_offers():
             3. Miejsce(od A do Z)
             4. Miejsce(od Z do A)
             5. Najpopularniejsze
-            6. Najmniej popularne""")  # popularność group by rezerwacje
+            6. Najmniej popularne
+            """)
             ask = int(input(""))
             if ask == 1:
-                add = ' ORDER BY cena;'
+                add = 'ORDER BY cena;'
                 sql = sql + add
-                print(sql)
-            cursor.execute(sql)
-            if ask == 2:
+            elif ask == 2:
                 add = ' ORDER BY cena DESC;'
                 sql = sql + add
-                print(sql)
-            cursor.execute(sql)
-            if ask == 3:
-                add = ' ORDER BY miasto;'
+            elif ask == 3:
+                add = 'GROUP BY h.nazwa ORDER BY m.miasto;'
                 sql = sql + add
-                print(sql)
-            cursor.execute(sql)
-            if ask == 4:
-                add = ' ORDER BY miasto DESC;'
+            elif ask == 4:
+                add = 'GROUP BY h.nazwa ORDER BY miasto DESC;'
                 sql = sql + add
-                print(sql)
+            elif ask == 5:
+                sql = ("SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, \
+                data_powrotu, COUNT(r.id_rezerwacji) AS LiczbaKupionych FROM oferta o \
+                LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca \
+                INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu \
+                INNER JOIN transport t ON t.id_transportu = o.id_transportu\
+                LEFT JOIN rezerwacja r ON r.id_oferty = o.id_oferty \
+                GROUP BY h.nazwa ORDER BY LiczbaKupionych DESC;")
+            elif ask == 6:
+                sql = ("SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, \
+                data_powrotu, COUNT(r.id_rezerwacji) AS LiczbaKupionych FROM oferta o \
+                LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca \
+                INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu \
+                INNER JOIN transport t ON t.id_transportu = o.id_transportu\
+                LEFT JOIN rezerwacja r ON r.id_oferty = o.id_oferty \
+                GROUP BY h.nazwa ORDER BY LiczbaKupionych ASC;")
             cursor.execute(sql)
-
             result = cursor.fetchall()
             print("Dostępne oferty: ")
             i = 1
@@ -169,25 +178,22 @@ def fix_autoincrement(var1, var2):
             key = key[0]
             sql1 = "ALTER TABLE %s AUTO_INCREMENT = %d" % (var2, result[0][key])
             cursor.execute(sql1)
-            cursor.commit()
+            connection.commit()
 
     finally:
         connection.close()
 
 
 def add_hotel():
-    connection = execute()
-
     nazwa = input("Podaj nazwę hotelu: ")
     cena = input("Podaj cenę za nocleg: ")
-    miejsce = -1
     show_places()
     q1 = input("Czy miejsce znajduje się w bazie? (Y/N)")
     if q1 == "N":
         add_place()
-    elif q1 == "Y":
-        miejsce = int(input("Podaj id miejsca: "))
+    miejsce = int(input("Podaj id miejsca: "))
 
+    connection = execute()
     try:
         with connection.cursor() as cursor:
             sql = ("INSERT INTO podroze_db.hotel (nocleg_cena, id_miejsca, nazwa) \
@@ -214,19 +220,17 @@ def add_hotel():
 
 
 def add_offer():
-    connection = execute()
-
     ilosc = int(input("Podaj ilość dostępnych miejsc: "))
     show_places()
     miejsce = int(input("Podaj id miejsca: "))
     data_w = input("Data wyjazdu: ")
     data_p = input("Data powrotu: ")
     transport = 11
-
+    connection = execute()
     try:
         with connection.cursor() as cursor:
             sql = ("SELECT id_hotelu,nazwa,nocleg_cena FROM hotel \
-            LEFT JOIN miejsce m ON m.id_miejsca = hotel.id_miejsca;")
+            WHERE id_miejsca = %d;")%miejsce
             cursor.execute(sql)
             result = cursor.fetchall()
             print("Baza hoteli w danym miejscu: ")
@@ -239,13 +243,14 @@ def add_offer():
             sql = "SELECT nocleg_cena FROM hotel WHERE id_hotelu = %d;" % hotel
             cursor.execute(sql)
             hotel_cena = cursor.fetchall()
-            hotel_cena = hotel_cena['nocleg_cena']
+            hotel_cena = list(hotel_cena)
+            hotel_cena = hotel_cena[0]['nocleg_cena']
 
         cena = 14 * hotel_cena
 
         with connection.cursor() as cursor:
             sql = ("INSERT INTO podroze_db.oferta(cena, ilosc_miejsc, id_miejsca,\
-            id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (%d,%d,%d,%d,%d,%s,%s);") \
+            id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES (%d,%d,%d,%d,%d,'%s','%s');") \
                   % (cena, ilosc, miejsce, transport, hotel, data_w, data_p)
             cursor.execute(sql)
 
@@ -314,23 +319,43 @@ def add_user():
                 connection.commit()
             else:
                 connection.rollback()
+                fix_autoincrement("id_klienta", "klient")
     finally:
         connection.close()
 
 
-def add_reservation():
+def add_reservation(nazwa):
     connection = execute()
-
     try:
         with connection.cursor() as cursor:
-            sql = ""
-            cursor.execute(sql)
+            osoby = int(input("Podaj liczbę osób: "))
+            sql = ("SELECT o.id_oferty,m.kraj, m.miasto, h.nazwa,  cena, data_wyjazdu, data_powrotu FROM oferta o \
+                    LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca \
+                    INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu \
+                    WHERE o.ilosc_miejsc > %d") % osoby
 
+            cursor.execute(sql)
+            row = cursor.fetchall()
+            for f in row:
+                print(f)
+            id_o = int(input("Wybierz id oferty:"))
+
+            sql1 = "SELECT id_klienta FROM klient \
+                   WHERE klient.email = '%s'" % nazwa
+            cursor.execute(sql1)
+            id = cursor.fetchall()
+            klient = list(id)
+            klient = klient[0]['id_klienta']
+
+            sql2 = "INSERT INTO podroze_db.rezerwacja (liczba_osob, data_rezerwacji,\
+                         platnosc, id_klienta, id_oferty) VALUES (%d, LOCALTIME(), 0, %d, %d);" % (osoby, klient, id_o)
+            cursor.execute(sql2)
             ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
             if ask == "Y":
                 connection.commit()
             else:
                 connection.rollback()
+                fix_autoincrement('id_rezerwacji', 'rezerwacja')
     finally:
         connection.close()
 
@@ -359,4 +384,3 @@ def my_reservations(email):
             connection.commit()
     finally:
         connection.close()
-
