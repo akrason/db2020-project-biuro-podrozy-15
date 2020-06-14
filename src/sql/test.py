@@ -70,16 +70,16 @@ def show_offers():
             """)
             ask = int(input(""))
             if ask == 1:
-                add = 'ORDER BY cena;'
+                add = ' ORDER BY cena;'
                 sql = sql + add
             elif ask == 2:
                 add = ' ORDER BY cena DESC;'
                 sql = sql + add
             elif ask == 3:
-                add = 'GROUP BY h.nazwa ORDER BY m.miasto;'
+                add = ' GROUP BY h.nazwa ORDER BY m.miasto;'
                 sql = sql + add
             elif ask == 4:
-                add = 'GROUP BY h.nazwa ORDER BY miasto DESC;'
+                add = ' GROUP BY h.nazwa ORDER BY miasto DESC;'
                 sql = sql + add
             elif ask == 5:
                 sql = ("SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, \

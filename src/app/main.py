@@ -1,6 +1,7 @@
 import src.sql.test as api
 import src.app.modules.klient as klient
 import src.app.modules.pracownik as pracownik
+import sys
 
 
 def start():
@@ -17,7 +18,8 @@ def start():
         haslo = input("Podaj hasło: ")
         if haslo == "podroze":
             while run == 1:
-                pracownik.panel_pracownika()
+                run = pracownik.panel_pracownika()
+            start()
         else:
             print("Błędne hasło")
             start()
@@ -26,8 +28,9 @@ def start():
         value = api.login_klient(nazwa)
         if value == 1:
             print("Zostałeś zalogowany")
-            while 1:
-                klient.panel_klienta(nazwa)
+            while run:
+                run = klient.panel_klienta(nazwa)
+            start()
         elif value == 2:
             print("Nie ma takie użytkownika w bazie. Spróbuj jeszcze raz lub zarejestruj się")
             start()
@@ -36,7 +39,6 @@ def start():
             start()
     elif ask == 3:
         api.add_user()
-
         start()
         pass
     elif ask == 4:
@@ -44,6 +46,5 @@ def start():
 
 
 if __name__ == '__main__':
-    import sys
     while 1:
         start()

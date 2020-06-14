@@ -9,7 +9,8 @@ def panel_klienta(email):
 3. Wykonaj rezerwacje
 4. Moje rezerwacje
 5. Usuń rezerwację
-6. Wyjście""")
+6. Powrót do menu
+7. Wyjście""")
     ask = int(input("Wybierz jedną z opcji: \n"))
     if ask == 1:
         api.show_offers()
@@ -25,5 +26,8 @@ def panel_klienta(email):
         api.my_reservations(email)
     elif ask == 5:
         api.delete_reservation(email)
-    else:
+    elif ask == 6:
+        return 2
+    elif ask == 7:
         sys.exit()
+    return 1

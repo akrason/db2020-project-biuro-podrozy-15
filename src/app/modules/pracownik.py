@@ -1,5 +1,4 @@
 import src.sql.test as api
-from src.app.main import start
 import sys
 
 
@@ -12,7 +11,7 @@ def panel_pracownika():
 5. Aktualizacja stanu płatności rezerwacji
 6. Powrót do menu
 7. Exit
-""") # jakieś updates i selecty jeszcze tu, na sam koniec exit
+""")  # jakieś updates i selecty jeszcze tu, na sam koniec exit
     ask = int(input("Wybierz jedną z opcji: \n"))
     if ask == 1:
         api.add_place()
@@ -25,6 +24,7 @@ def panel_pracownika():
     elif ask == 5:
         api.update_payment()
     elif ask == 6:
-        start()
+        return 2
     elif ask == 7:
         sys.exit()
+    return 1
