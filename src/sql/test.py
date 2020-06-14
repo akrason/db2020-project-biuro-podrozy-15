@@ -251,6 +251,18 @@ def add_offer():
             print("Baza hoteli w danym miejscu: ")
             for f in result:
                 print(f)
+        ask = input("Czy chcesz dodać nowy hotel? (Y/N) ")
+        if ask == "Y":
+            add_hotel()
+
+        with connection.cursor() as cursor:
+            sql = ("SELECT id_hotelu,nazwa,nocleg_cena FROM hotel \
+            WHERE id_miejsca = %d;") % miejsce
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            print("Baza hoteli w danym miejscu: ")
+            for f in result:
+                print(f)
 
         hotel = int(input("Podaj id hotelu: "))
 
@@ -368,7 +380,7 @@ def add_reservation(nazwa):
             row = cursor.fetchall()
             for f in row:
                 print(f)
-            id_o = int(input("Wybierz id oferty:"))
+            id_o = int(input("Wybierz id oferty: "))
 
             sql1 = "SELECT id_klienta FROM klient \
                    WHERE klient.email = '%s'" % nazwa
@@ -417,10 +429,10 @@ def my_reservations(email):
 
 
 def update_hotel():
-    kraj = input("W jakim kraju znajduje się hotel? :")
+    kraj = input("W jakim kraju znajduje się hotel? ")
     show_hotels(kraj)
-    hotel = int(input("Wybierz id hotelu"))
-    cena = float(input("Wpisz nową cenę"))
+    hotel = int(input("Wybierz id hotelu: "))
+    cena = float(input("Wpisz nową cenę: "))
     connection = execute()
     try:
         with connection.cursor() as cursor:
@@ -440,7 +452,7 @@ def update_hotel():
 def update_payment():
 
     klient = int(input("Podaj id klienta: "))
-    platnosc = input("Czy klient zapłacił za rezerwację? (Y/N) ")
+    platnosc = input("Czy klient zapłacił za rezerwację?(Y/N):  ")
     if platnosc == "Y":
         p = 1
     else:
