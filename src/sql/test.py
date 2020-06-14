@@ -350,6 +350,16 @@ def add_reservation(nazwa):
             sql2 = "INSERT INTO podroze_db.rezerwacja (liczba_osob, data_rezerwacji,\
                          platnosc, id_klienta, id_oferty) VALUES (%d, LOCALTIME(), 0, %d, %d);" % (osoby, klient, id_o)
             cursor.execute(sql2)
+
+            sql3 = "SELECT ilosc_miejsc FROM oferta WHERE id_oferty = '%s'" % id_o
+            cursor.execute(sql3)
+            miejsca = cursor.fetchall()
+            oferta = list(miejsca)
+            oferta = oferta[0]['ilosc_miejsc']
+            oferta = oferta - osoby
+
+            sql4 = "UPDATE oferta SET ilosc_miejsc = '%d' WHERE id_oferty =  '%d'" % (oferta, id_o)
+            cursor.execute(sql4)
             ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
             if ask == "Y":
                 connection.commit()
@@ -360,12 +370,12 @@ def add_reservation(nazwa):
         connection.close()
 
 
-def my_reservations(email):
+def delete_reservation(email):
     connection = execute()
 
     try:
         with connection.cursor() as cursor:
-            sql = ("SELECT klient.imie, klient.nazwisko, miejsce.kraj, miejsce.miasto,\
+            sql = ("SELECT rezerwacja.id_rezerwacji, klient.imie, klient.nazwisko, miejsce.kraj, miejsce.miasto,\
             hotel.nazwa, rezerwacja.liczba_osob, rezerwacja.data_rezerwacji,\
             oferta.data_wyjazdu, oferta.data_powrotu, oferta.cena,\
             transport.typ_transportu, transport.miejsce_wyjazdu FROM klient\
@@ -374,6 +384,79 @@ def my_reservations(email):
             INNER JOIN transport ON oferta.id_transportu=transport.id_transportu\
             INNER JOIN hotel ON oferta.id_hotelu=hotel.id_hotelu\
             INNER JOIN miejsce ON hotel.id_miejsca=miejsce.id_miejsca WHERE klient.email = '%s';") % email
+            cursor.execute(sql)
+
+            result = cursor.fetchall()
+            print("Moje rezerwacje: ")
+            for f in result:
+                print(f)
+
+            id_r = int(input("Wybierz id rezerwacji do usunięcia:"))
+
+            sql1 = ("SELECT platnosc FROM rezerwacja INNER JOIN klient ON rezerwacja.id_klienta =\
+                    klient.id_klienta WHERE klient.email = '%s'\
+                    AND rezerwacja.id_rezerwacji = '%d'") % (email, id_r)
+            cursor.execute(sql1)
+            platnosc = cursor.fetchall()
+            if not platnosc:
+                print("Brak rezerwacji o podanym id")
+            else:
+                status = list(platnosc)
+                status = status[0]['platnosc']
+                if status == 1:
+                    print("Nie można usunąć opłaconej rezerwacji!")
+                elif status == 0:
+                    sql2 = ("SELECT liczba_osob FROM rezerwacja\
+                     WHERE id_rezerwacji = '%d'") % id_r
+                    cursor.execute(sql2)
+                    liczba_o = cursor.fetchall()
+                    l_o = list(liczba_o)
+                    l_o = l_o[0]['liczba_osob']
+
+                    sql3 = ("SELECT rezerwacja.id_oferty FROM rezerwacja\
+                    WHERE id_rezerwacji = '%d'") % id_r
+                    cursor.execute(sql3)
+                    id_of = cursor.fetchall()
+                    id_o = list(id_of)
+                    id_o = id_o[0]['id_oferty']
+
+                    sql4 = "DELETE FROM rezerwacja WHERE id_rezerwacji = '%d'" % id_r
+                    cursor.execute(sql4)
+
+                    sql5 = "SELECT ilosc_miejsc FROM oferta WHERE id_oferty = '%d'" % id_o
+                    cursor.execute(sql5)
+                    liczba_miejsc = cursor.fetchall()
+                    lm = list(liczba_miejsc)
+                    lm = lm[0]['ilosc_miejsc']
+                    lm = lm + l_o
+
+                    sql6 = ("UPDATE oferta SET ilosc_miejsc = '%d'\
+                     WHERE id_oferty = '%d'") % (lm, id_o)
+                    cursor.execute(sql6)
+
+                    ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
+                    if ask == "Y":
+                        connection.commit()
+                    else:
+                        connection.rollback()
+    finally:
+        connection.close()
+
+
+def my_reservations(email):
+    connection = execute()
+
+    try:
+        with connection.cursor() as cursor:
+            sql = ("SELECT klient.imie, klient.nazwisko, miejsce.kraj, miejsce.miasto,\
+                hotel.nazwa, rezerwacja.liczba_osob, rezerwacja.data_rezerwacji,\
+                oferta.data_wyjazdu, oferta.data_powrotu, oferta.cena,\
+                transport.typ_transportu, transport.miejsce_wyjazdu FROM klient\
+                INNER JOIN rezerwacja ON rezerwacja.id_klienta=klient.id_klienta\
+                INNER JOIN oferta ON rezerwacja.id_oferty=oferta.id_oferty\
+                INNER JOIN transport ON oferta.id_transportu=transport.id_transportu\
+                INNER JOIN hotel ON oferta.id_hotelu=hotel.id_hotelu\
+                INNER JOIN miejsce ON hotel.id_miejsca=miejsce.id_miejsca WHERE klient.email = '%s';") % email
             cursor.execute(sql)
 
             result = cursor.fetchall()

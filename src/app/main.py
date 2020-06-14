@@ -16,7 +16,7 @@ def start():
     if ask == 1:
         haslo = input("Podaj hasło: ")
         if haslo == "podroze":
-            while run ==1 :
+            while run == 1:
                 pracownik.panel_pracownika()
         else:
             print("Błędne hasło")
