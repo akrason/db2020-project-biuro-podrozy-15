@@ -560,3 +560,32 @@ def update_payment():
             connection.commit()
     finally:
         connection.close()
+
+
+def delete_res():
+    connection = execute()
+    try:
+        with connection.cursor() as cursor:
+
+            klient = int(input("Podaj id klienta: "))
+            sql = "SELECT * FROM rezerwacja Where id_klienta = %d" % klient
+            cursor.execute(sql)
+
+            result = cursor.fetchall()
+            print("Rezerwacje klienta: ")
+            for f in result:
+                print(f)
+
+            rez = int(input("Podaj id rezerwacji: "))
+            sql1 = "DELETE FROM rezerwacja WHERE id_rezerwacji = %d" % rez
+            cursor.execute(sql1)
+
+            ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
+            if ask == "Y":
+                connection.commit()
+
+            else:
+                connection.rollback()
+
+    finally:
+        connection.close()

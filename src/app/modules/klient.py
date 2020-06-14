@@ -1,4 +1,4 @@
-import src.sql.test as api
+import src.sql.funkcje as api
 import sys
 
 
