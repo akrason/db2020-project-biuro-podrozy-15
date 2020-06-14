@@ -10,7 +10,7 @@ def panel_pracownika():
 4. Nowa cena noclegu w hotelu
 5. Aktualizacja stanu płatności rezerwacji
 6. Powrót do menu
-7. Exit
+7. Wyjście
 """)  # jakieś updates i selecty jeszcze tu, na sam koniec exit
     ask = int(input("Wybierz jedną z opcji: \n"))
     if ask == 1:

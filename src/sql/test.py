@@ -1,6 +1,5 @@
 import os
 import pymysql
-from datetime import datetime
 
 
 def execute():

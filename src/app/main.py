@@ -11,7 +11,7 @@ def start():
 1. Logowanie do panelu pracownika
 2. Logowanie jako klient
 3. Rejestracja
-4. Koniec
+4. Wyjście
 """)
     ask = int(input("Wybierz jedną z opcji: \n"))
     if ask == 1:
