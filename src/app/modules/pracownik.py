@@ -11,7 +11,7 @@ def panel_pracownika():
 5. Aktualizacja stanu płatności rezerwacji
 6. Powrót do menu
 7. Wyjście
-""")  # jakieś updates i selecty jeszcze tu, na sam koniec exit
+""")  
     ask = int(input("Wybierz jedną z opcji: \n"))
     if ask == 1:
         api.add_place()
