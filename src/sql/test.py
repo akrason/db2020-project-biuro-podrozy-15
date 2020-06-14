@@ -1,5 +1,6 @@
 import os
 import pymysql
+from datetime import datetime
 
 
 def execute():
@@ -125,7 +126,7 @@ def show_hotels(miejsce):
     connection = execute()
     try:
         with connection.cursor() as cursor:
-            sql = ("SELECT kraj,miasto,hotel.nazwa,hotel.nocleg_cena FROM miejsce\
+            sql = ("SELECT  hotel.id_hotelu, kraj,miasto,hotel.nazwa,hotel.nocleg_cena FROM miejsce\
             INNER JOIN hotel ON miejsce.id_miejsca = hotel.id_miejsca\
             WHERE kraj LIKE '%s';") % miejsce
             cursor.execute(sql)
@@ -134,6 +135,19 @@ def show_hotels(miejsce):
             for x in result:
                 print(x)
 
+    finally:
+        connection.close()
+
+
+def show_transport():
+    connection = execute()
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM transport"
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            for f in result:
+                print(f)
     finally:
         connection.close()
 
@@ -225,12 +239,25 @@ def add_offer():
     miejsce = int(input("Podaj id miejsca: "))
     data_w = input("Data wyjazdu: ")
     data_p = input("Data powrotu: ")
-    transport = 11
+    show_transport()
+    transport = int(input("Podaj id transportu: "))
     connection = execute()
     try:
         with connection.cursor() as cursor:
             sql = ("SELECT id_hotelu,nazwa,nocleg_cena FROM hotel \
-            WHERE id_miejsca = %d;")%miejsce
+            WHERE id_miejsca = %d;") % miejsce
+            cursor.execute(sql)
+            result = cursor.fetchall()
+            print("Baza hoteli w danym miejscu: ")
+            for f in result:
+                print(f)
+        ask = input("Czy chcesz dodać nowy hotel? (Y/N) ")
+        if ask == "Y":
+            add_hotel()
+
+        with connection.cursor() as cursor:
+            sql = ("SELECT id_hotelu,nazwa,nocleg_cena FROM hotel \
+            WHERE id_miejsca = %d;") % miejsce
             cursor.execute(sql)
             result = cursor.fetchall()
             print("Baza hoteli w danym miejscu: ")
@@ -246,7 +273,22 @@ def add_offer():
             hotel_cena = list(hotel_cena)
             hotel_cena = hotel_cena[0]['nocleg_cena']
 
-        cena = 14 * hotel_cena
+        with connection.cursor() as cursor:
+            sql = "SELECT koszt_transportu FROM transport WHERE id_transportu = %d;" % transport
+            cursor.execute(sql)
+            transport_cena = cursor.fetchall()
+            transport_cena = list(transport_cena)
+            transport_cena = transport_cena[0]['koszt_transportu']
+
+        with connection.cursor() as cursor:
+            sql = "SELECT DATEDIFF('%s','%s');" % (data_p, data_w)
+            cursor.execute(sql)
+            dni = cursor.fetchall()
+            key = list(dni[0].keys())
+            key = key[0]
+            dni = dni[0][key]
+
+        cena = dni * hotel_cena + 2 * transport_cena
 
         with connection.cursor() as cursor:
             sql = ("INSERT INTO podroze_db.oferta(cena, ilosc_miejsc, id_miejsca,\
@@ -338,7 +380,7 @@ def add_reservation(nazwa):
             row = cursor.fetchall()
             for f in row:
                 print(f)
-            id_o = int(input("Wybierz id oferty:"))
+            id_o = int(input("Wybierz id oferty: "))
 
             sql1 = "SELECT id_klienta FROM klient \
                    WHERE klient.email = '%s'" % nazwa
@@ -464,6 +506,57 @@ def my_reservations(email):
             for f in result:
                 print(f)
 
+            connection.commit()
+    finally:
+        connection.close()
+
+
+def update_hotel():
+    kraj = input("W jakim kraju znajduje się hotel? ")
+    show_hotels(kraj)
+    hotel = int(input("Wybierz id hotelu: "))
+    cena = float(input("Wpisz nową cenę: "))
+    connection = execute()
+    try:
+        with connection.cursor() as cursor:
+            sql = "UPDATE hotel SET nocleg_cena = %d WHERE id_hotelu = %d" % (cena, hotel)
+            cursor.execute(sql)
+            ask = input("Czy chcesz wprowadzić następujące zmiany?(Y/N): ")
+            if ask == "Y":
+                connection.commit()
+
+            else:
+                connection.rollback()
+
+    finally:
+        connection.close()
+
+
+def update_payment():
+
+    klient = int(input("Podaj id klienta: "))
+    platnosc = input("Czy klient zapłacił za rezerwację?(Y/N):  ")
+    if platnosc == "Y":
+        p = 1
+    else:
+        p = 0
+
+    connection = execute()
+    try:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM rezerwacja Where id_klienta = %d"%klient
+            cursor.execute(sql)
+
+            result = cursor.fetchall()
+            print("Rezerwacje klienta: ")
+            for f in result:
+                print(f)
+
+        rez = int(input("Podaj id rezerwacji: "))
+
+        with connection.cursor() as cursor:
+            sql = "UPDATE rezerwacja SET platnosc = %d WHERE id_rezerwacji = %d" % (p, rez)
+            cursor.execute(sql)
             connection.commit()
     finally:
         connection.close()
