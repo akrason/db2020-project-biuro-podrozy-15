@@ -8,7 +8,7 @@ Projekt bazy biura podróży wykonany w ramach ćwiczeń projektowych z Baz Dany
 
 ## Projekt bazy danych
 Tutaj ma znaleźć się opis projektu bazy danych. Na wstępie proszę zagnieździć obraz schematu w formie wektorowej, najlepiej plik SVG. Dodatkowo, w tej sekcji należy zawrzeć kilka przykładowych zapytań tworzących (lub w razie konieczności, modyfikujących) tabelę, tj. grupa DDL.
-<img src="Schemat bazy.svg" alt="TEST">
+<img src="schemat_bd_ver2.svg" alt="TEST">
 ## Implementacja zapytań SQL
 Tutaj należy wylistować wszystkie funkcjonalności, wraz z odpowiednimi zapytaniami SQL. W tej sekcji należy zawrzeć wyłącznie zapytania z grupy DML oraz DQL.
 
