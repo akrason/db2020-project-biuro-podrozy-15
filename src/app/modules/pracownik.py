@@ -1,4 +1,5 @@
 import src.sql.test as api
+from src.app.main import start
 import sys
 
 
@@ -7,8 +8,10 @@ def panel_pracownika():
 1. Dodawanie miejsca do bazy
 2. Dodawanie hotelu do bazy
 3. Dodawanie oferty
-4. Powrót do menu
-5. Exit
+4. Nowa cena noclegu w hotelu
+5. Aktualizacja stanu płatności rezerwacji
+6. Powrót do menu
+7. Exit
 """) # jakieś updates i selecty jeszcze tu, na sam koniec exit
     ask = int(input("Wybierz jedną z opcji: \n"))
     if ask == 1:
@@ -18,6 +21,10 @@ def panel_pracownika():
     elif ask == 3:
         api.add_offer()
     elif ask == 4:
-        pass
+        api.update_hotel()
     elif ask == 5:
+        api.update_payment()
+    elif ask == 6:
+        start()
+    elif ask == 7:
         sys.exit()
