@@ -82,7 +82,7 @@ W aplikacji menu startowe zawiera opcje:
 <li>1.Logowanie do panelu pracownika </li>
 <li>2.Logowanie jako klient</li>
 <li>3.Rejestracja</li>
-<li>4.Koniec</li>
+<li>4.Wyjście</li>
 </ul>
 
 Panel pracownika zabezpieczony jest hasłem, tak aby klienci nie mogli edytować bazy danych według swoich upodobań.
@@ -97,7 +97,7 @@ Po zalogowaniu do panelu pracownika wyświetlają się opcje:
 <li>4.Nowa cena noclegu w hotelu</li>
 <li>5.Aktualizacja stanu płatności rezerwacji</li>
 <li>6.Powrót do menu</li>
-<li>7.Exit</li>
+<li>7.Wyjście</li>
 </ul>
 
 Po wybraniu interesującej nas funkcji aplikacja wykonuje polecenia SQL potrzebne do prawidłowej edycji bazy.
@@ -124,4 +124,4 @@ Kolejne opcje służą do zarządzania rezerwacjami na zaoferowane przez biuro p
 Aplikacja podzielona jest na 4 pliki main.py - do uruchomienia programu z załączonym menu startowym, klient.py i pracownik.py, które zawierają panele 
 z odpowiednimi funkcjami do wyboru oraz test.py, w którym zawarte są wszystkie funkcjonalności potrzebne do prawidłowego działania programu. 
 ## Dodatkowe uwagi
-W tej sekcji możecie zawrzeć informacje, których nie jesteście w stanie przypisać do pozostałych. Mogą to być również jakieś komentarze, wolne uwagi, itp.
+W przypadku, gdy klient nie widzi odpowiedniej dla siebie oferty pracownik może stworzyć indywidualną ofertę z określoną liczbą miejsc. 
