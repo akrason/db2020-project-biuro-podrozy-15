@@ -199,7 +199,7 @@ def fix_autoincrement(var1, var2):
 
 def add_hotel():
     nazwa = input("Podaj nazwę hotelu: ")
-    cena = input("Podaj cenę za nocleg: ")
+    cena = float(input("Podaj cenę za nocleg: "))
     show_places()
     q1 = input("Czy miejsce znajduje się w bazie? (Y/N)")
     if q1 == "N":
@@ -210,7 +210,7 @@ def add_hotel():
     try:
         with connection.cursor() as cursor:
             sql = ("INSERT INTO podroze_db.hotel (nocleg_cena, id_miejsca, nazwa) \
-            VALUES ( '%s', %d,'%s');") % (cena, miejsce, nazwa)
+            VALUES ( %d, %d,'%s');") % (cena, miejsce, nazwa)
             cursor.execute(sql)
             sql1 = "SELECT nocleg_cena, nazwa FROM hotel WHERE nazwa = '%s';" % nazwa
 

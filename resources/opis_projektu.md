@@ -72,9 +72,123 @@ INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES 
 INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (5, 120.24, 10, 'Pied-a-Terre');
 ```
 
-
+W pliku funkcje.py został wprowadzony ALTER tablic do naprawy inkrementacji po wycofaniu się z dodawania nowych rekordów
+```sql
+SELECT MAX(id_oferty) FROM oferta;
+ALTER TABLE oferta AUTO_INCREMENT = 24;
+```
+(przykładowe dane, które w programie są otrzymywane z zapytań)
 ## Implementacja zapytań SQL
-Tutaj należy wylistować wszystkie funkcjonalności, wraz z odpowiednimi zapytaniami SQL. W tej sekcji należy zawrzeć wyłącznie zapytania z grupy DML oraz DQL.
+
+[1]. Sortowanie ofert od najniższej ceny:
+
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+ORDER BY cena;
+```
+
+[2]. Sortowanie ofert od najwyższej ceny:
+
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+ORDER BY cena DESC;
+```
+
+[3]. Sortowanie ofert alfabetycznie od A do Z z pogrupowaniem na poszczególne hotele:
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+GROUP BY h.nazwa ORDER BY m.miasto;
+```
+[4]. Sortowanie ofert alfabetycznie od Z do A z pogrupowaniem na poszczególne hotele:
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+GROUP BY h.nazwa ORDER BY m.miasto DESC;
+```
+
+[5]. Sortowanie ofert od najpopularniejszej oferty:
+
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu, COUNT(r.id_rezerwacji) AS LiczbaKupionych FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+LEFT JOIN rezerwacja r ON r.id_oferty = o.id_oferty 
+GROUP BY h.nazwa ORDER BY LiczbaKupionych DESC;
+```
+[6]. Sortowanie ofert od najrzadziej kupowanej:
+
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu, COUNT(r.id_rezerwacji) AS LiczbaKupionych FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+LEFT JOIN rezerwacja r ON r.id_oferty = o.id_oferty 
+GROUP BY h.nazwa ORDER BY LiczbaKupionych ASC;
+```
+
+[7]. Wyświetlanie miejsc w danym kraju
+```sql
+SELECT kraj,miasto FROM miejsce 
+WHERE kraj LIKE 'Hiszpania'
+```
+
+[8]. Wyświetlanie hoteli w danym kraju
+```sql
+SELECT  hotel.id_hotelu, kraj,miasto,hotel.nazwa,hotel.nocleg_cena FROM miejsce
+INNER JOIN hotel ON miejsce.id_miejsca = hotel.id_miejsca
+WHERE kraj LIKE 'Kanada';
+```
+
+[9]. Wyświetlanie miejsc z bazy razem z id (potrzebne do dodawania miejsc)
+```sql
+SELECT * FROM miejsce;
+```
+
+[10].Wyświetlanie transportu z bazy razem z id (potrzebne do dodawania ofert)
+```sql
+SELECT * FROM transport
+```
+
+[11].Dodawanie nowych miejsc do bazy
+```sql
+INSERT INTO podroze_db.miejsce (kraj, miasto) VALUES ( 'Polska', 'Sandomierz');
+```
+ - wyświetlenie wprowadzonych zmian (aby, użytkownik mógł zdecydować czy na pewno chce je wykonać(commit/rollback))
+ ```sql
+SELECT kraj,miasto FROM miejsce WHERE kraj = 'Polska' AND miasto = 'Sandomierz';
+```
+
+[12]
+```sql
+INSERT INTO podroze_db.hotel (nocleg_cena, id_miejsca, nazwa) VALUES ( 315, 5,'Mały Rzym');
+```
+- wyświetlenie wprowadzonych zmian (aby, użytkownik mógł zdecydować czy na pewno chce je wykonać(commit/rollback))
+```sql
+SELECT nocleg_cena, nazwa FROM hotel WHERE nazwa = 'Mały Rzym';
+```
+
+[13].
+```sql
+
+```
 
 ## Aplikacja
 W aplikacji menu startowe zawiera opcje:
@@ -122,6 +236,6 @@ użytkownik ma możliwość wyświetlenia hoteli w danym kraju.
 Kolejne opcje służą do zarządzania rezerwacjami na zaoferowane przez biuro podróże.
 
 Aplikacja podzielona jest na 4 pliki main.py - do uruchomienia programu z załączonym menu startowym, klient.py i pracownik.py, które zawierają panele 
-z odpowiednimi funkcjami do wyboru oraz test.py, w którym zawarte są wszystkie funkcjonalności potrzebne do prawidłowego działania programu. 
+z odpowiednimi funkcjami do wyboru oraz funkcje.py, w którym zawarte są wszystkie funkcjonalności potrzebne do prawidłowego działania programu. 
 ## Dodatkowe uwagi
 W przypadku, gdy klient nie widzi odpowiedniej dla siebie oferty pracownik może stworzyć indywidualną ofertę z określoną liczbą miejsc. 
