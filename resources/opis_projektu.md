@@ -334,6 +334,7 @@ DELETE FROM rezerwacja WHERE id_rezerwacji = 7;
 - żądanie zatwierdzenia wprowadzenia zmian
 
 ## Aplikacja
+
 W aplikacji menu startowe zawiera opcje:
 <ul>
 <li>1.Logowanie do panelu pracownika </li>
@@ -353,8 +354,9 @@ Po zalogowaniu do panelu pracownika wyświetlają się opcje:
 <li>3.Dodawanie oferty</li>
 <li>4.Nowa cena noclegu w hotelu</li>
 <li>5.Aktualizacja stanu płatności rezerwacji</li>
-<li>6.Powrót do menu</li>
-<li>7.Wyjście</li>
+<li>6.Usunięcie rezerwacji</li>
+<li>7.Powrót do menu</li>
+<li>8.Wyjście</li>
 </ul>
 
 Po wybraniu interesującej nas funkcji aplikacja wykonuje polecenia SQL potrzebne do prawidłowej edycji bazy.
