@@ -1,189 +1,386 @@
-# Wytyczne do projektu z przedmiotu Bazy Danych 2020
+# Temat projektu
+Projekt bazy biura podróży wykonany w ramach ćwiczeń projektowych z Baz Danych.
 
-| Kierunek              | Przedmiot   | Semestr | Rok akademicki |
-| :-------------------: | :---------: | :-----: | :------------: |
-| Informatyka Stosowana | Bazy danych | 4       | 2019/2020      |
+| Nazwisko i imię  | Wydział | Kierunek | Semestr | Grupa | Rok akademicki |
+| :-------------:  | :-----: | :------: | :-----: | :---: | :------------: |
+| Krasoń Aleksandra| WIMiIP  | IS       |   4     | 2     | 2019/2020      |
+| Kusik Karol      | WIMiIP  | IS       |   4     | 2     | 2019/2020      |
 
-## Informacje wstępne
-Projekt z przedmiotu Bazy Danych realizowany jest w grupach dwuosobowych. Celem projektu jest **zaprojektowanie** oraz **implementacja** systemu bazodanowego na wylosowany przez grupę temat. Grupa ma prawo zmienić temat na inny, wybrany przez siebie, jednak nie może się on znajdować na zbiorczej liście.
+## Projekt bazy danych
+Diagram bazy:
 
-## Struktura projektu
-```bash
-.
-├── /resources/    # Pliki zasobów w projekcie (SS, rysunki, schematy)
-│   └── /README.md # Opis projektu w formie pliku markdown
-├── /src/          # Katalog główny projektu
-│   ├── /app/      # Kod źródłowy aplikacji
-│   └── /sql/      # Zapytania SQL
-├── /.gitignore    # Pliki i foldery pomijane przy commitowaniu do repozytorium
-└── /README.md     # Opis projektu: wytyczne
+<img src="schemat_bd_ver2.svg" alt="TEST">
+
+Temat: Biuro podróży
+
+Jest to realizacja bazy danych biura podróży organizującego wakacyjne wycieczki międzynarodowe. 
+
+Baza znajduje się w pliku podroze_db.sql
+
+Baza danych składa się z 6 encji:
+<ul>
+<li>Klient</li>
+<li>Rezerwacja</li>
+<li>Oferta</li>
+<li>Miejsce</li>
+<li>Hotel</li>
+<li>Transport</li>
+</ul>
+
+Każda z nich jest połączona odpowiednimi relacjami, które umożliwiają wprowadzenie wielu rozbudowanych funkcjonalności.
+
+Tworzenie tabeli:
+```sql
+create table klient
+(
+    id_klienta  int(6) unsigned auto_increment primary key,
+    imie        varchar(30)     not null,
+    nazwisko    varchar(30)     not null,
+    email       varchar(50)     unique not null,
+    nr_telefonu int(9) unsigned not null,
+    haslo varchar(30) not null
+);
 ```
-Projekt składa się z trzech części - projektu bazy danych, zaimplementowania funkcjonalności za pomocą języka SQL oraz wykorzystaniem napisanych zapytań w aplikacji.
+```sql
+create table hotel
+(
+    id_hotelu   int(6) unsigned auto_increment primary key,
+    nocleg_cena decimal(6, 2)   null,
+    id_miejsca  int(6) unsigned null,
+    nazwa       varchar(50)     null,
+    constraint hotel_ibfk_1 foreign key (id_miejsca) references miejsce (id_miejsca)
+);
 
-### Projekt bazy danych
-Pierwszym etapem projektu jest stworzenie schematu bazy danych i jego wizualizacja przy pomocy diagramu ERD. Diagram należy przechowywać w repozytorium i zaprezentować w postaci pliku markdown. [Przykładowy plik](resources/example.md) znajduje się w katalogu resources. Najlepszym rozwiązaniem będzie zastąpienie treści tego pliku opisem projektu.
+create index id_miejsca
+    on hotel (id_miejsca);
 
-Schemat bazy powinien być przemyślany i zawierać niezbędne encje oraz łączące je relacje. Niedopuszczalne jest, aby diagram był niespójny - wszystkie encje powinny być połączone w _jeden spójny system_. Liczba encji na schemacie oraz szczegółowość ich opisu wpływa na ocenę końcową.
-
-W miarę możliwości, encje należy rozstawiać w sposób niwelujący przecięcia lub minimalizujący ich liczbę. Zbyt duża liczba połączeń na schemacie może być przyczyną wystąpienia przecięć. Wówczas należy przeanalizować schemat i w razie konieczności usunąć zbędne powiązania między encjami.
-
-### Implementacja zapytań SQL
-Przygotowany schemat bazy danych ma służyć, by przechowywać stan aplikacji, co pozwala na realizowanie wielu z jej funkcjonalności. W odniesieniu do oprogramowania, funkcjonalność pozwala na zrealizowanie potrzeby użytkownika w ściśle określonych warunkach. Inaczej, jest to możliwość oferowana przez system informatyczny, spełniająca wymagania jego użytkowników.
-
-Funkcjonalność składa się ze zbioru funkcji (sekwencji kroków), który umożliwia uzyskanie finalnego rezultatu, jakiego spodziewa się użytkownik. Na poziomie oprogramowania może to być metoda klasy, cała klasa a czasem nawet moduł.
-
-Państwa zadaniem będzie zaimplementowanie strony bazodanowej, która jest podstawą do zrealizowania wielu funkcjonalności klasycznego systemu informatycznego. Schemat bazy danych został wykonany w poprzednim etapie niniejszego projektu. W tym z kolei należy napisać odpowiednie CRUDy (INSERT, UPDATE, DELETE oraz proste jednotabelowe SELECTy) oraz zapytania grupy DQL (ang. _Data Query Language_), które na poziomie aplikacji dostarczą możliwości do implementacji interfejsu użytkownika, zaspokajających wymagania uzytkowników projektowanego systemu. Definicja tych potrzeb należy do Was: należy je sformułować w formie opisowej (zdanie lub kilka zdań) a następnie napisać jako zapytanie lub grupę zapytań SQL (patrz punkt 3 poniżej: jest to przykład wykorzystania podzapytań). W kolejnym etapie zapytania te mają zostać wykorzystane w prostej aplikacji.
-
-Przykłady funkcjonalności w kontekście bazodanowym:
-1. Przeszukiwanie samochodu po pojemności silnika i marce. Dodatkowo użytkownik systemu życzy sobie posortować wyniki wyszukiwania po liczbie koni mechanicznych.
-    ```sql
-    SELECT m.mark_name, c.model, m.in_produce, c.no_doors, c.engine_displacement, c.hp
-    FROM Car c
-    LEFT JOIN Mark m ON c.mark_id=m.mark_id
-    ORDER BY c.hp;
-    ```
-    Wybór kolumn zależy od poziomu szczegółowości systemu.
-2. Wyświetlenie ile samochodów danej marki znajduje się aktualnie w sprzedaży. Na początku wyświetl marki z największą liczbą samochodów.
-    ```sql
-    SELECT COUNT(c.mark_id) AS cars_count, m.mark_name
-    FROM Car c
-    LEFT JOIN Mark m ON c.mark_id=m.mark_id
-    GROUP BY m.mark_name
-    ORDER BY cars_count DESC;
-    ```
-3. Aktualizacja bieżącej ceny pojazdu na podstawie tabeli żniżek dla aut wyprodukowanych w zeszłym roku.
-    ```sql
-    UPDATE Car c
-    SET
-        c.price = c.price * (
-            SELECT d.val
-            FROM Discount d
-            WHERE d.criteria='prev_year'
-        )
-    WHERE c.production_year = YEAR(CURDATE()) - 1;
-    ```
-
-### Aplikacja
-Etapem ostatnim projektu jest zaimplementowanie prostej aplikacji (najlepiej konsolowej) do wizualizacji projektu systemu. Preferowany jest język Python w połączeniu z biblioteką [ _pymysql_](https://pymysql.readthedocs.io/en/latest/).
-Aplikacja powinna wykorzystywać napisane wcześniej zapytania SQL (CRUD+DQL), by zrealizować wylistowane w opisie systemu funkcjonalności. Apka **nie może** mieć formy **wyłącznie** switcha:
-```java
-switch(choice) {
-    case 1: func1(args); break;
-    case 2: func2(args); break;
-    //etc
-    default: print(message);
-}
-```
-gdyż nie taki jest cel jej implementacji. Poprawne rozwiązanie może zawierać w sobie takie rozgałęzienie opcji wyboru, jednak należy pamiętać o odpowiednim przepływie informacji - należy umożliwić interakcję z użytkownikiem. Przykładowe drzewo interakcji:
-
-```java
-// Wprowadź swój numer klienta
-// Wyświetl listę możliwych operacji
-// 1. Kup bilet
-    // Wybierz rodzaj ulgi
-        // a. Ulga ustawowa
-        // b. Ulga samorządowa
-        // c. Bilet normalny
-    // Wprowadź liczbę biletów, którą chcesz kupić
-    // Informacja zwrotna z systemu czy udało się kupić bilety lub wyjaśnienie co spowodowało błąd
-    callSqlFunctionAndShowOutput(input);
-// 2. Zwróć niewykorzystany bilet
-    // Wyświetl bilety, które nie zostały wykorzystane
-    // Wybierz bilet, który chcesz zwrócić
-    // Informacja zwrotna z systemu czy udało się zwrócić bilet lub wyjaśnienie co spowodowało błąd
-    callSqlFunctionAndShowOutput(input);
-// 3. Sprawdź swoje bilety
-    // Wyświetl listę wszystkich biletów, zakupionych przez użytkownika
-    callSqlFunctionAndShowOutput(viewId);
-// 4. Wyjście z programu
-    exit();
 ```
 
-Jest to przykład ilustrujący przepływ informacji w systemie. W zależności od wprowadzonych informacji (`input`) wywoyłane będzie inne zapytanie SQL. Obiekt `viewId` można traktować jako numer widoku, np. pod numerem 4 wywoływany jest widok wszystkich biletów (zapytanie SELECT). Jednak finalny kod aplikacji powinien być dostosowany pod konkretny projekt a wywołania funkcji odnosić się do obiektów związanych z systemem, np. `user.addNewTickets(discountType, ticketCount)`.
+Wprowadzenie danych:
+```sql
+INSERT INTO podroze_db.miejsce (id_miejsca, kraj, miasto) VALUES (1, 'Polska', 'Zakopane');
+INSERT INTO podroze_db.miejsce (id_miejsca, kraj, miasto) VALUES (2, 'Polska', 'Gdańsk');
+INSERT INTO podroze_db.miejsce (id_miejsca, kraj, miasto) VALUES (3, 'Polska', 'Olsztyn');
+INSERT INTO podroze_db.miejsce (id_miejsca, kraj, miasto) VALUES (4, 'Polska', 'Ciechocinek');
+```
 
-Proszę pamiętać, że aplikacja jest **dla Was**, nie dla mnie i ma Wam pomóc w zrozumieniu funkcji baz danych w wytwarzaniu oprogramowania. Z punktu widzenia wyłącznie tego projektu, implementacja apki ma Wam pomóc w dwójnasób:
-* Łatwiej jest definiować zapytania pod funkcjonalności, których działanie można zweryfikować.
-* Implementując UI pod zapytania zwiększa się szansa na wykrycie błędów w samym schemacie lub zapytaniu.
+```sql
+INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (1, 100.56, 5, 'El Pingüino');
+INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (2, 255.78, 12, 'Paradis');
+INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (3, 92.00, 2, 'Smart');
+INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (4, 390.15, 6, 'Poseidon');
+INSERT INTO podroze_db.hotel (id_hotelu, nocleg_cena, id_miejsca, nazwa) VALUES (5, 120.24, 10, 'Pied-a-Terre');
+```
 
-Napisanie aplikacji jest obowiązkowe do zaliczenia projektu, jednak jej jakość nie będzie w znacznym stopniu wpływała na ocenę z projektu.
+W pliku funkcje.py został wprowadzony ALTER tablic do naprawy inkrementacji po wycofaniu się z dodawania nowych rekordów
+```sql
+SELECT MAX(id_oferty) FROM oferta;
+ALTER TABLE oferta AUTO_INCREMENT = 24;
+```
+(przykładowe dane, które w programie są otrzymywane z zapytań)
+## Implementacja zapytań SQL
 
-### Przykładowy projekt
-Przykładowy projekt znajdą Państwo w przygotowanym przeze mnie [repozytorium](https://github.com/phajder-databases/sample-project). Proszę, aby Państwo nie kopiowali 1:1 mojej wizji. Podany projekt ma charakter wyłącznie poglądowy i jest niewystarczający do uzyskania pozytywnej oceny.
+[1]. Sortowanie ofert od najniższej ceny:
 
-## Wymagania i kryteria oceny
-Ocena z projektu będzie średnią ważoną trzech czynników:
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+ORDER BY cena;
+```
 
-| Lp. |       Czynnik       |  Waga |
-| :-: | :------------------ | :---: |
-|  1  | Projekt bazy danych |  0.3  |
-|  2  | Implementacja SQL   |  0.6  |
-|  3  | Aplikacja           |  0.1  |
+[2]. Sortowanie ofert od najwyższej ceny:
 
-Do uzyskania pozytywnej oceny konieczne jest wykonanie wszystkich trzech części oraz wykonanie stosownego opisu w pliku [README.md](project/README.md). Cała praca powinna znajdować się w wygenerowanym na Github Classroom repozytorium.
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+ORDER BY cena DESC;
+```
 
-Dla każdej z części obowiązują następujące wymagania:
-1. Schemat bazy danych powinien składać się z co najmniej 5 encji, jednak ich faktyczna liczba powinna wynikać z realizowanego tematu oraz być zwiększana w oparciu o zdefiniowane przez Was funkcjonalności. Nie należy jednak tego rozumieć na zasadzie 1 encja = 1 funkcjonalność. Dodatkowe informacje:
-    1. Każda z encji musi podsiadać klucz główny i, jeśli to możliwe, powinien być to klucz naturalny, np. numer albumu studenta jest dobrym kluczem naturalnym, jednak numer PESEL obywatela już nie ze względów bezpieczeństwa. Numer ISBN książki jest klasycznym przykładem klucza naturalnego, gdyż jest unikalny i każda książka go posiada. Z przyczyn technicznych nie należy stosować kluczy złożonych, gdyż utrudni to pracę z relacjami (wyjątkiem mogą być tabele pośrednie relacji m..n, jednak tylko w przypadku gdy nie posiada ona innych kolumn).
-    2. Na schemacie nie mogą znajdować się rozłączne fragmenty, w nomenklaturze teoriografowej, schemat powinien być spójny.
-    3. Nie należy sztucznie pompować schematu w dodatkowe encje lub atrybuty, jeżeli nie ma to podparcia w późniejszej implementacji zapytań. Na schemacie powinny zostać zawarte wyłącznie wykorzystywane elementy.
-2. Najważniejszą częścią projektu jest implementacja zapytań SQL, realizujących wskazane w projekcie funkcjonalności.
-    1. Każda z funkcjonalności musi składać się z _co najmniej jednego_ zapytania. Nie dopuszcza się sytuacji, w której jedno zapytanie realizuje więcej niż jedną funkcjonalność.
-    2. W zależności od wykorzystanej palety klauzul (JOIN'y, unie, GROUP BY'e, HAVING'i, podzapytania - to w granicach rozsądku, może jakieś CTE jak zdążymy przerobić) przyznawane będą różne liczby punktów.
-        1. Ważne jest, aby zapytania nie były przesadnie rozbudowane, gdyż to sprawia więcej bólu niż przynosi korzyści.
-        2. Będę patrzył również na _sensowność_ zapytania. Uważajcie więc na _over-engineering_. Nie powinno być przerostu formy nad treścią.
-    3. Ocena zależeć będzie również od liczby zaproponowanych funkcjonalności. W standardowych przypadkach można przyjąć, że max punktów jest za 12 funkcjonalności (po 5% max punktów za zapytanie). Jeżeli będą to zapytania w stylu zagnieżdżonych w sobie grupowań, mogę to zaliczać x2.
-    4. Jeśli schemat będzie przejrzysty a opis projektu schludny, to dużo łatwiej jest mi ocenić jego jakość. Należy jak najmniej pozostawić domysłom. Dobrym założeniem w opisie tej części będzie, że czytelnik (tj. ja) ma mierne pojęcie o bazach danych.
-    5. Wszystkie zapytania, wraz z funkcjonalnością jaką realizują oraz krótkim opisem, powinny znaleźć się w opisie projektu.
-3. Ostatnim elementem oceny będzie aplikacja, jednak jak łatwo zauważyć, nie jest ona wysoko punktowana. Dobra aplikacja będzie mieć głównie wpływ w przyadku, gdy waham się pomiędzy ocenami.
-    1. W opisie projektu powinny znaleźć się 2-3 snippety, w jaki sposób realizujecie zapytania do bazy. Opis będzie wtedy kompletny.
-    2. Aplikacja jest zwieńczeniem Waszej pracy z jednej strony, z drugiej natomiast pozwoli Wam wyłapać błędy. Możecie więc przyjąć jedną z dwóch taktyk. Wybierzcie mądrze, w zależności od tego jak Wam się najlepiej pracuje:
-        1. Podejście iteracyjne - po każdym kamieniu milowym (ustalajcie sobie je jak chcecie) dokonujecie implementacji w aplikacji. W ten sposób unikniecie długiej męki pod koniec.
-        2. Implementacja apki pod sam koniec - w ten sposób skupicie się głównie na projekcie bazy, jednak w razie rażących błędów, może okazać się, że braknie później czasu na poprawę.
-    3. Dobrze byłoby też zawrzeć krótki opis (1-2 komendy, 2-3 zdania) jak aplikację uruchomić oraz jak ją obsługiwać, np. można przedstawić jeden prosty usecase.
+[3]. Sortowanie ofert alfabetycznie od A do Z z pogrupowaniem na poszczególne hotele:
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+GROUP BY h.nazwa ORDER BY m.miasto;
+```
+[4]. Sortowanie ofert alfabetycznie od Z do A z pogrupowaniem na poszczególne hotele:
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+GROUP BY h.nazwa ORDER BY m.miasto DESC;
+```
 
-Jeżeli coś jest niejasne, bardzo proszę o zakładanie Issues. W ten sposób wszyscy będziecie mieć dostęp do mojej odpowiedzi na czyjeś wątpliwości. Będę też informował w takim Issues o wprowadzonych zmianach.
+[5]. Sortowanie ofert od najpopularniejszej oferty:
 
-## Narzędzia
-1. [_Projekt bazy danych_](#projekt-bazy-danych): diagram powinien być czytelny, więc należy go wyeksportować do formatu wektorowego, najlepiej SVG. Do tego celu można wykorzystać następujące narzędzia:
-    1. [DrawIO](https://drawio-app.com/). Przykład dołączenia diagramów DrawIO do pliku markdown znajdą Państwo w [wiki DrawIO](https://github.com/jgraph/drawio/wiki/Embed-Diagrams) oraz na [ich repo](https://github.com/jgraph/drawio-github).
-    2. [Visual Paradigm](https://www.visual-paradigm.com/tutorials/how-to-model-relational-database-with-erd.jsp). Plik projektu VP nie musi znajdować się na repo, wystarczy tylko wyeksportowana grafika.
-    3. Niektóre IDE do pracy z BD mają wbudowane narzędzia do generacji takich diagramów, np. [SQL Server Management Studio](https://stackoverflow.com/questions/32379038/how-to-generate-entity-relationship-er-diagram-of-a-database-using-microsoft-s) dla MSSQL czy [DataGrip](https://www.jetbrains.com/help/datagrip/creating-diagrams.html).
-2. [_Implementacja zapytań SQL_](#implementacja-zapytań-sql): do pisania zapytań SQL można wykorzystać dowolne IDE, pozwalające na pracę z bazami danych:
-    1. [Squirrel SQL](http://squirrel-sql.sourceforge.net/) jest lekkim Javowym klientem do obsługi połączeń z bazami danych.
-    2. [DataGrip](https://www.jetbrains.com/datagrip/) multiplatformowy klient do połączeń z bazami danych. Wymagana jest licencja, by z niego korzystać, jednak studenci i pracownicy uczelni mają ją za darmo. Trzeba tylko zarejestrować się z mailem w domenie edu.
-    3. [Narzędzia JetBrains'a](https://www.jetbrains.com/help/pycharm/managing-data-sources.html) mają dostępny plugin do obsługi baz danych, więc można połączyć pracę z bazą i implementację w Pythonie w PyCharm'ie.
-    4. **Uwaga**: do połączenia z bazą danych wymagany jest odpowiedni sterownik. [Czym jest sterownik?](https://www.jdatalab.com/information_system/2017/02/16/database-driver.html) W DataGrip'ie to jeden przycisk, w Squirrelu trzeba dodać go w [odpowiedni sposób](http://home.agh.edu.pl/~phajder/2020_IS_BD/extra/SquirrelConfig.pdf).
-3. [_Aplikacja_](#aplikacja): do implementacji aplikacji zalecam wykorzystanie języka Python w połączeniu z biblioteką do bazy mysql - [_pymysql_](https://pymysql.readthedocs.io/en/latest/). Do pracy można wykorzystać następujace IDE:
-    1. [PyCharm](https://www.jetbrains.com/pycharm/) od JetBrainsa. Wersja community powinna być wystarczająca. Znacząco uprości to też pracę z gitem.
-    2. [Visual Studio Code](https://code.visualstudio.com/). Małe IDE, które można rozbudować pod własne potrzeby. Konieczne będzie zainstalowanie [pluginu do Pythona](https://github.com/Microsoft/vscode-python) przez menedżer pluginów. Dostępne są też narzędzia do pracy z SQLem.
-    3. Dopuszczalne jest wykorzystanie innego języka programowania, np. Java, C#, js, przy czym prosiłbym o indywidualny kontakt w takiej sytuacji. Nie wolno wykorzystywać frameworków typu ORM, gdyż projekt polega na pisaniu zapytań SQL.
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu, COUNT(r.id_rezerwacji) AS LiczbaKupionych FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+LEFT JOIN rezerwacja r ON r.id_oferty = o.id_oferty 
+GROUP BY h.nazwa ORDER BY LiczbaKupionych DESC;
+```
+[6]. Sortowanie ofert od najrzadziej kupowanej:
 
-## Uwagi i wskazówki
-1. Najważniejsza sprawa na początek - niezależnie czy zajęcia wrócą do normalnej formy czy do końca semestru będą prowadzone zdalnie, pamiętajcie jedną rzecz: **Ja się nie domyślę, że czegoś nie potraficie zrobić lub czegoś nie rozumiecie**. Musicie koniecznie się ze mną komunikować, gdyż podczas oddawania projektu nie chcę słyszeć _myśmy nie wiedzieli..._ Jestem tu po to, żeby Wam pomóc i wyjaśnić wątpliwości, jednak musicie mi dawać odpowiednio wcześnie znać.
-2. Do pracy nad projektem wymagana jest praca na repozytorium gitowym. Informacje na ten temat przekażę Państwu w ramach wykładu z _Administracji Sieciami Komputerowymi_. Nieumiejętna praca z takim repozytorium może nie tylko przysporzyć problemów, ale również doprowadzić to całkowitej _utylizacji_ Waszego projektu. Dopóki nie będziecie czuć się pewnie z gitem, trzymajcie sobie gdzieś kopię plików (nie kopiujcie całego repo, bo jest tam katalog _.git_, który może Wam bardzo wiele namieszać, gdybyście spróbowali nadpisywać jego pliki).
-3. Celem napisania aplikacji do obsługi bazy danych jest zrozumienie sensu wykorzystywania baz danych. Taka aplikacja może Państwu pomóc w ocenie, czy dane zapytanie zostało poprawnie napisane. Powinna również ocenę poprawności schematu.
-4. Ocenę będę rozpoczynał od czytania opisu. Gdy coś będzie niejasne lub czegoś nie będę rozumiał, będę pytał Was zaglądając do umieszczonego kodu. Im lepszy opis, tym mniej wątpliwości mieć będę i tym lepszą ocenę wystawię.
-5. Jako że projekt jest dwuosobowy, dzielcie się pracą. Ładnie będzie później to widać w repozytorium a przy okazji nauczycie się w nim pracować w małej, ale jednak grupie. O ile tworzenie schematu ciężko będzie zrealizować w formie dzielonej, o tyle już pisanie funkcjonalności zdecydowanie da się prowadzić równolegle. To samo tyczy się aplikacji.
-6. Gdy będę miał wątpliwości czy obie osoby mają równomierny wkład w projekt, będę zerkał w historię commitów. Może warto jednak o to zadbać?
+```sql
+SELECT m.kraj, m.miasto, h.nazwa, t.typ_transportu, t.miejsce_wyjazdu, cena, data_wyjazdu, 
+data_powrotu, COUNT(r.id_rezerwacji) AS LiczbaKupionych FROM oferta o 
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca 
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu 
+INNER JOIN transport t ON t.id_transportu = o.id_transportu
+LEFT JOIN rezerwacja r ON r.id_oferty = o.id_oferty 
+GROUP BY h.nazwa ORDER BY LiczbaKupionych ASC;
+```
 
-## Przydatne materiały
-1. Poza wykładem z ASK, dołączam tutaj przykładowe źródła dotyczące gita:
-    1. [Pro Git by Scott Chacon](https://git-scm.com/book/pl/v2);
-    2. [Git basics by Academind](https://academind.com/learn/web-dev/git-the-basics/);
-    3. Nie jestem zwolennikiem zaczynania nauki od YT, bo często _prowadzący_ popełnia sporo błędów lub wprowadza skróty myślowe, jednak te trzy filmy zasługują na uznanie i mogę je polecić z czystym sumieniem:
-        1. [Git - core concepts](https://www.youtube.com/watch?v=uR6G2v_WsRA);
-        2. [Git - branching and merging](https://www.youtube.com/watch?v=FyAAIHHClqI);
-        3. [Git - remotes](https://www.youtube.com/watch?v=Gg4bLk8cGNo);
-2. Projektowanie baz danych:
-    1. [Wykład o projektowaniu BD](https://docs.google.com/presentation/d/1ZLtBj2qpUruyJmJaJmpjUP3DGLLbHKZt3ADerRlyp3U) z kursu CS145 na Stanford;
-    2. Wykłady od Piotra Macioła;
-3. Diagramy ERD:
-    1. [Entiti Relationship Diagram](https://www.smartdraw.com/entity-relationship-diagram/) w Internecie;
-    2. [Model ER wiki](https://en.wikipedia.org/wiki/Entity%E2%80%93relationship_model);
-    3. [Wykład o modelach ER](https://docs.google.com/presentation/d/1-2I78MMznp_8HZytF1YOdsLlTABlRiKasJH9ffriwHg) z kursu CS145 na Stanford;
-4. Język SQL:
-    1. [Tech on the Net](https://www.techonthenet.com/mysql/index.php);
-    2. [Geeks for Geeks](https://www.geeksforgeeks.org/sql-ddl-dql-dml-dcl-tcl-commands/);
-    3. Dokumentacja: [mysql](https://dev.mysql.com/doc/) lub [mariadb](https://mariadb.com/kb/en/documentation/);
-    4. Instrukcje na [mojej stronie](http://home.agh.edu.pl/~phajder/2020_IS_BD/).
-5. Najlepszym przyjacielem niniejszego projektu powinien być znany wszystkim Internet.
+[7]. Wyświetlanie miejsc w danym kraju
+```sql
+SELECT kraj,miasto FROM miejsce 
+WHERE kraj LIKE 'Hiszpania'
+```
+
+[8]. Wyświetlanie hoteli w danym kraju
+```sql
+SELECT  hotel.id_hotelu, kraj,miasto,hotel.nazwa,hotel.nocleg_cena FROM miejsce
+INNER JOIN hotel ON miejsce.id_miejsca = hotel.id_miejsca
+WHERE kraj LIKE 'Kanada';
+```
+
+[9]. Wyświetlanie miejsc z bazy razem z id (potrzebne do dodawania miejsc)
+```sql
+SELECT * FROM miejsce;
+```
+
+[10].Wyświetlanie transportu z bazy razem z id (potrzebne do dodawania ofert)
+```sql
+SELECT * FROM transport
+```
+
+[11].Dodawanie nowych miejsc do bazy
+```sql
+INSERT INTO podroze_db.miejsce (kraj, miasto) VALUES ( 'Polska', 'Sandomierz');
+```
+ - wyświetlenie wprowadzonych zmian (aby, użytkownik mógł zdecydować czy na pewno chce je wykonać(commit/rollback))
+ ```sql
+SELECT kraj,miasto FROM miejsce WHERE kraj = 'Polska' AND miasto = 'Sandomierz';
+```
+
+[12].Dodawanie nowego hotelu do bazy
+```sql
+INSERT INTO podroze_db.hotel (nocleg_cena, id_miejsca, nazwa) VALUES ( 315, 5,'Mały Rzym');
+```
+- wyświetlenie wprowadzonych zmian (aby, użytkownik mógł zdecydować czy na pewno chce je wykonać(commit/rollback))
+```sql
+SELECT nocleg_cena, nazwa FROM hotel WHERE nazwa = 'Mały Rzym';
+```
+
+[13].Dodawanie nowej oferty do bazy (początkowe wyświetlenie hoteli w danym miejscu w celu wyboru istniejącego lub dodanie nowego)
+```sql
+SELECT id_hotelu,nazwa,nocleg_cena FROM hotel WHERE id_miejsca = 3;
+```
+- uzyskanie ceny doby w wybranym hotelu
+```sql
+SELECT nocleg_cena FROM hotel WHERE id_hotelu = 2;
+```
+- uzyskanie ceny wybranego transportu
+```sql
+SELECT koszt_transportu FROM transport WHERE id_transportu = 1;
+```
+- uzyskanie liczby dni danego wyjazdu do obliczenia całkowitej ceny oferty
+```sql
+SELECT DATEDIFF(2020-06-24 13:30:00, 2020-06-19 19:00:00);
+```
+- dodanie nowej oferty do bazy
+```sql
+INSERT INTO podroze_db.oferta(cena, ilosc_miejsc, id_miejsca,
+id_transportu, id_hotelu, data_wyjazdu, data_powrotu) VALUES
+(2056.78, 45, 3, 2, 6, 2020-06-19 19:00:00, 2020-06-24 13:30:00);
+```
+- żądanie zatwierdzenia wprowadzenia zmian
+
+[14].Logowanie się przez klienta <p>
+- odczytanie bazy w celu porównania z danymi z logowania
+```sql
+"SELECT email, haslo FROM klient"
+```
+
+[15].Dodawanie uzytkownika <p>
+- sprawdzenie czy klient z podanym adresem email już istnieje
+```sql
+SELECT email FROM klient WHERE email = rad@polon.fr
+```
+- utworzenie klienta o podanych danych w bazie
+```sql
+INSERT INTO podroze_db.klient(imie, nazwisko, email, nr_telefonu, haslo) 
+VALUES ('Marie', 'Curie', 'rad@polon.fr', 124563564, '123e');
+```
+
+[16].Utworzenie rezerwacji przez klienta 
+- na podstawie podanej liczby osób przez klienta wyświetlane są oferty, w których jest wystarczająco miejsc
+```sql
+SELECT o.id_oferty,m.kraj, m.miasto, h.nazwa,  cena, data_wyjazdu, data_powrotu FROM oferta o
+LEFT JOIN miejsce m ON m.id_miejsca = o.id_miejsca
+INNER JOIN hotel h ON h.id_hotelu = o.id_hotelu
+WHERE o.ilosc_miejsc >= 5;
+```
+- uzyskanie id klienta o podanym adresie e-mail
+```sql
+SELECT id_klienta FROM klient
+WHERE klient.email = 'szybkabryka@gmail.com';
+```
+- utworzenie nowej rezerwacji w bazie
+```sql
+INSERT INTO podroze_db.rezerwacja (liczba_osob, data_rezerwacji,
+platnosc, id_klienta, id_oferty) VALUES (4, LOCALTIME(), 0, 7, 3);
+```
+- sprawdzenie dostępnej liczby miejsc w danej ofercie
+```sql
+SELECT ilosc_miejsc FROM oferta WHERE id_oferty = 3;
+```
+- pomniejszenie liczby wolnych miejsc o liczbę zarezerwowaną
+```sql
+UPDATE oferta SET ilosc_miejsc = 53 WHERE id_oferty = 3;
+```
+- żądanie zatwierdzenia wprowadzenia zmian
+
+[17].Wycofanie rezerwacji
+- wyświetlenie rezerwacji klienta
+```sql
+SELECT rezerwacja.id_rezerwacji, klient.imie, klient.nazwisko, miejsce.kraj, miejsce.miasto,
+hotel.nazwa, rezerwacja.liczba_osob, rezerwacja.data_rezerwacji, oferta.data_wyjazdu,
+oferta.data_powrotu, oferta.cena, transport.typ_transportu, transport.miejsce_wyjazdu FROM klient
+INNER JOIN rezerwacja ON rezerwacja.id_klienta=klient.id_klienta
+INNER JOIN oferta ON rezerwacja.id_oferty=oferta.id_oferty
+INNER JOIN transport ON oferta.id_transportu=transport.id_transportu
+INNER JOIN hotel ON oferta.id_hotelu=hotel.id_hotelu
+INNER JOIN miejsce ON hotel.id_miejsca=miejsce.id_miejsca WHERE klient.email = 'rad@polon.fr';
+```
+- sprawdzenie statusu płatności rezerwacji (możliwość wycofania tylko nieopłaconych)
+```sql
+SELECT platnosc FROM rezerwacja INNER JOIN klient ON rezerwacja.id_klienta =
+klient.id_klienta WHERE klient.email = 'rad@polon.fr'
+AND rezerwacja.id_rezerwacji = 7;
+```
+- sprawdzenie liczby osób w rezerwacji
+```sql
+SELECT liczba_osob FROM rezerwacja
+WHERE id_rezerwacji = 7;
+```
+- sprawdzenie id oferty w rezerwacji
+```sql
+SELECT rezerwacja.id_oferty FROM rezerwacja
+WHERE id_rezerwacji = 7;
+```
+- usunięcie rezerwacji
+```sql
+DELETE FROM rezerwacja WHERE id_rezerwacji = 7;
+```
+- zwiększenie liczby wolnych miejsc w ofercie
+```sql
+UPDATE oferta SET ilosc_miejsc = 55
+WHERE id_oferty = 3;
+```
+- żądanie zatwierdzenia wprowadzenia zmian
+
+[18].Wyświetlenie własnych rezerwacji
+```sql
+SELECT klient.imie, klient.nazwisko, miejsce.kraj, miejsce.miasto,
+hotel.nazwa, rezerwacja.liczba_osob, rezerwacja.data_rezerwacji,
+oferta.data_wyjazdu, oferta.data_powrotu, oferta.cena,
+transport.typ_transportu, transport.miejsce_wyjazdu FROM klient
+INNER JOIN rezerwacja ON rezerwacja.id_klienta=klient.id_klienta
+INNER JOIN oferta ON rezerwacja.id_oferty=oferta.id_oferty
+INNER JOIN transport ON oferta.id_transportu=transport.id_transportu
+INNER JOIN hotel ON oferta.id_hotelu=hotel.id_hotelu
+INNER JOIN miejsce ON hotel.id_miejsca=miejsce.id_miejsca WHERE klient.email = 'rad@polon.fr';
+```
+
+[19].Zaktualizowanie ceny noclegu w hotelu przez pracownika
+```sql
+UPDATE hotel SET nocleg_cena = 543.56 WHERE id_hotelu = 3;
+```
+- żądanie zatwierdzenia wprowadzenia zmian
+
+[20].Zmiana statusu opłacenia rezerwacji 
+- wyświetlenie rezerwacji wybranego klienta
+```sql
+SELECT * FROM rezerwacja WHERE id_klienta = 3;
+```
+- zmiana statusu płatności wybranej rezerwacji
+```sql
+UPDATE rezerwacja SET platnosc = 1 WHERE id_rezerwacji = 7;
+```
+
+[21]. Usunięcie rezerwacji przez pracownika 
+- wyświetlenie rezerwacji wybranego klienta
+```sql
+SELECT * FROM rezerwacja WHERE id_klienta = 3;
+```
+- usunięcie rezerwacji
+```sql
+DELETE FROM rezerwacja WHERE id_rezerwacji = 7;
+```
+- żądanie zatwierdzenia wprowadzenia zmian
+
+## Aplikacja
+
+W aplikacji menu startowe zawiera opcje:
+<ul>
+<li>1.Logowanie do panelu pracownika </li>
+<li>2.Logowanie jako klient</li>
+<li>3.Rejestracja</li>
+<li>4.Wyjście</li>
+</ul>
+
+Panel pracownika zabezpieczony jest hasłem, tak aby klienci nie mogli edytować bazy danych według swoich upodobań.
+Logowanie jako klient pobiera e-mail od użytkownika i sprawdza czy użytkownik jest zarejestrowany w bazie, po czym pobiera hasło i sprawdza jego poprawność.
+Jeżeli klient nie jest zarejestrowany w bazie może to zrobić wybierając opcję numer 3.
+
+Po zalogowaniu do panelu pracownika wyświetlają się opcje:
+<ul>
+<li>1.Dodawanie miejsca do bazy </li>
+<li>2.Dodawanie hotelu do bazy</li>
+<li>3.Dodawanie oferty</li>
+<li>4.Nowa cena noclegu w hotelu</li>
+<li>5.Aktualizacja stanu płatności rezerwacji</li>
+<li>6.Usunięcie rezerwacji</li>
+<li>7.Powrót do menu</li>
+<li>8.Wyjście</li>
+</ul>
+
+Po wybraniu interesującej nas funkcji aplikacja wykonuje polecenia SQL potrzebne do prawidłowej edycji bazy.
+
+Panel klienta składa się z :
+
+<ul>
+<li>1.Dostępne oferty </li>
+<li>2.Wyszukaj miejsce</li>
+<li>3.Wykonaj rezerwacje</li>
+<li>4.Moje rezerwacje</li>
+<li>5.Usuń rezerwację</li>
+<li>6.Powrót do menu</li>
+<li>7.Wyjście</li>
+</ul>
+
+Opcja dostępne oferty wyświetla listę ofert biura posortowanych według wyboru użytkownika : Najpopularniejsze, Najtańsze, Alfabetycznie itp.
+
+Wyszukaj miejsce służy do sprawdzenia czy w bazie biura jest miejsce, które interesuje klienta. W przypadku wystąpienia odpowiedniego miejsca,
+użytkownik ma możliwość wyświetlenia hoteli w danym kraju.
+
+Kolejne opcje służą do zarządzania rezerwacjami na zaoferowane przez biuro podróże.
+
+Aplikacja podzielona jest na 4 pliki main.py - do uruchomienia programu z załączonym menu startowym, klient.py i pracownik.py, które zawierają panele 
+z odpowiednimi funkcjami do wyboru oraz funkcje.py, w którym zawarte są wszystkie funkcjonalności potrzebne do prawidłowego działania programu. 
+## Dodatkowe uwagi
+W przypadku, gdy klient nie widzi odpowiedniej dla siebie oferty pracownik może stworzyć indywidualną ofertę z określoną liczbą miejsc. 
